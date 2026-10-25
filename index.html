@@ -206,14 +206,13 @@
         </div>
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Pilih File Berkas JSON:</label>
-          <input type="file" id="import-file-input" accept=".json" onchange="window.LMS.handleImportFileSelect(event)" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+          <input type="file" id="import-file-input" accept=".json" onchange="window.LMS.handleImportFileSelect(this)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
         </div>
         <div id="import-preview-result" class="hidden"></div>
       </div>
       <div class="pt-3 border-t flex justify-end gap-2 text-xs">
         <button onclick="window.LMS.closeImportModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold">Batal</button>
-        <button id="btn-commit-import" disabled onclick="window.LMS.commitImport()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md disabled:opacity-40 disabled:cursor-not-allowed">
-          Proses Impor
+        <button id="btn-commit-import" onclick="window.LMS.prosesImporJSON()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold cursor-pointer">
         </button>
       </div>
     </div>
