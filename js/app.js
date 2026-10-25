@@ -1,6 +1,6 @@
 /**
  * Kontroler Utama & Router LMS TKA SD — Fase 2.1
- * Mendukung Tipe Soal: PG, PGK_MCMA, PGK_KATEGORI, dan ISIAN
+ * Mendukung Tipe Soal: PG, PGK_MCMA, PGK_KATEGORI, ISIAN + Impor/Ekspor JSON
  */
 import { getStore, saveStore } from './store/localStore.js';
 import { DAFTAR_MATA_PELAJARAN } from './data/curriculum.js';
@@ -283,7 +283,6 @@ function viewHalamanLatihan(store) {
 
         <p class="text-sm font-bold text-slate-900 leading-snug">${escapeHtml(soal.question || soal.tanya)}</p>
 
-        <!-- KONTEN BUTIR SOAL DINAMIS SESUAI TIPE -->
         <div class="pt-2">
           ${renderInputInteraktifSoal(soal, ans)}
         </div>
@@ -310,7 +309,6 @@ function viewHalamanLatihan(store) {
 function renderInputInteraktifSoal(soal, ans) {
   const tipe = (soal.questionType || soal.tipe || "PG").toUpperCase();
 
-  // 1. Tipe Pilihan Ganda Tunggal
   if (tipe === "PG") {
     const rawOpts = soal.options || soal.opsi || [];
     return `
@@ -330,7 +328,6 @@ function renderInputInteraktifSoal(soal, ans) {
     `;
   }
 
-  // 2. Tipe Pilihan Ganda Kompleks MCMA (Pilihan Lebih dari Satu)
   if (tipe === "PGK_MCMA") {
     const rawOpts = soal.options || soal.opsi || [];
     const userArray = Array.isArray(ans) ? ans : [];
@@ -352,7 +349,6 @@ function renderInputInteraktifSoal(soal, ans) {
     `;
   }
 
-  // 3. Tipe Pilihan Ganda Kompleks Kategori (Tabel Benar / Salah)
   if (tipe === "PGK_KATEGORI") {
     const statements = soal.statements || soal.pernyataan || [];
     const userMap = (typeof ans === "object" && ans !== null) ? ans : {};
@@ -391,7 +387,6 @@ function renderInputInteraktifSoal(soal, ans) {
     `;
   }
 
-  // 4. Tipe Isian Singkat
   return `
     <div class="space-y-1">
       <label class="block text-slate-700 text-xs font-semibold mb-1">Ketikkan jawaban Anda:</label>
@@ -457,16 +452,12 @@ function viewHalamanPembahasan(store) {
 
 function renderRekapKunciPembahasan(s, userAns, tipe) {
   if (tipe === "PG") {
-    return `
-      <div>Jawaban Anda: <strong class="font-mono text-slate-900">${escapeHtml(userAns || 'Tidak diisi')}</strong> | Kunci: <strong class="text-emerald-700 font-mono">${escapeHtml(s.correctAnswer || s.kunci)}</strong></div>
-    `;
+    return `<div>Jawaban Anda: <strong class="font-mono text-slate-900">${escapeHtml(userAns || 'Tidak diisi')}</strong> | Kunci: <strong class="text-emerald-700 font-mono">${escapeHtml(s.correctAnswer || s.kunci)}</strong></div>`;
   }
   if (tipe === "PGK_MCMA") {
     const kArray = Array.isArray(s.correctAnswer || s.kunci) ? (s.correctAnswer || s.kunci) : [s.correctAnswer || s.kunci];
     const uArray = Array.isArray(userAns) ? userAns : [];
-    return `
-      <div>Pilihan Anda: <strong class="font-mono text-slate-900">[${uArray.join(', ') || 'Kosong'}]</strong> | Kunci: <strong class="text-emerald-700 font-mono">[${kArray.join(', ')}]</strong></div>
-    `;
+    return `<div>Pilihan Anda: <strong class="font-mono text-slate-900">[${uArray.join(', ') || 'Kosong'}]</strong> | Kunci: <strong class="text-emerald-700 font-mono">[${kArray.join(', ')}]</strong></div>`;
   }
   if (tipe === "PGK_KATEGORI") {
     const stmts = s.statements || s.pernyataan || [];
@@ -479,17 +470,13 @@ function renderRekapKunciPembahasan(s, userAns, tipe) {
             const k = Boolean(st.correct ?? st.kunci);
             const u = uMap[i];
             const isMatch = (u === k);
-            return `
-              <li>${escapeHtml(st.text || st)} — Kunci: <strong class="text-emerald-700">${k ? 'Benar' : 'Salah'}</strong> (Pilihan: ${u !== undefined ? (u ? 'Benar' : 'Salah') : 'Kosong'}) ${isMatch ? '✅' : '❌'}</li>
-            `;
+            return `<li>${escapeHtml(st.text || st)} — Kunci: <strong class="text-emerald-700">${k ? 'Benar' : 'Salah'}</strong> (Pilihan: ${u !== undefined ? (u ? 'Benar' : 'Salah') : 'Kosong'}) ${isMatch ? '✅' : '❌'}</li>`;
           }).join('')}
         </ul>
       </div>
     `;
   }
-  return `
-    <div>Jawaban Anda: <strong class="font-mono text-slate-900">${escapeHtml(userAns || 'Tidak diisi')}</strong> | Kunci Sahih: <strong class="text-emerald-700 font-mono">${escapeHtml(s.correctAnswer || s.kunci)}</strong></div>
-  `;
+  return `<div>Jawaban Anda: <strong class="font-mono text-slate-900">${escapeHtml(userAns || 'Tidak diisi')}</strong> | Kunci Sahih: <strong class="text-emerald-700 font-mono">${escapeHtml(s.correctAnswer || s.kunci)}</strong></div>`;
 }
 
 // --- VIEW: DASHBOARD ORANG TUA ---
@@ -516,7 +503,7 @@ function viewEvaluasiSimulasi() {
   `;
 }
 
-// --- VIEW: PANEL ADMIN BANK SOAL ---
+// --- VIEW: PANEL ADMIN BANK SOAL (DENGAN TOMBOL IMPOR & EKSPOR) ---
 function viewAdminKonten(store) {
   const bank = store.bankSoal || [];
   return `
@@ -529,6 +516,9 @@ function viewAdminKonten(store) {
         <div class="flex flex-wrap items-center gap-2">
           <button onclick="window.LMS.openAdminModal()" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5">
             <i data-lucide="plus" class="w-4 h-4"></i> Tambah Butir Soal
+          </button>
+          <button onclick="window.LMS.openImportModal()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5">
+            <i data-lucide="upload" class="w-4 h-4"></i> Impor JSON
           </button>
           <button onclick="window.LMS.eksporJSON()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5">
             <i data-lucide="download" class="w-4 h-4"></i> Ekspor JSON
@@ -638,7 +628,6 @@ window.LMS = {
     navigate("#/anak/latihan");
   },
 
-  // Pengendali Input Beragam Tipe Jawaban
   pilihJawaban(id, kode) {
     const s = getStore();
     s.jawabanSesiAktif[id] = kode;
@@ -854,6 +843,104 @@ window.LMS = {
     saveStore(s);
     window.LMS.closeAdminModal();
     renderApp();
+  },
+
+  // ---------------- FITUR IMPOR & EKSPOR JSON ----------------
+  openImportModal() {
+    let modal = document.getElementById("import-modal");
+    if (!modal) {
+      // Buat elemen modal secara otomatis jika belum ada di HTML
+      modal = document.createElement("div");
+      modal.id = "import-modal";
+      modal.className = "fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4";
+      modal.innerHTML = `
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border space-y-4">
+          <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="font-extrabold text-slate-900 text-sm">Impor Berkas Bank Soal (JSON)</h3>
+            <button onclick="window.LMS.closeImportModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+          </div>
+          <p class="text-xs text-slate-600">Pilih berkas <code>.json</code> yang berisi kumpulan butir soal terstruktur.</p>
+          <input type="file" id="json-file-input" accept=".json" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 border p-2 rounded-xl">
+          <div id="import-report" class="hidden p-3 rounded-xl text-xs max-h-40 overflow-y-auto"></div>
+          <div class="flex justify-end gap-2 pt-2 border-t">
+            <button onclick="window.LMS.closeImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">Batal</button>
+            <button onclick="window.LMS.prosesImporJSON()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm">Mulai Impor</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    } else {
+      modal.classList.remove("hidden");
+    }
+
+    const report = document.getElementById("import-report");
+    if (report) report.classList.add("hidden");
+    const input = document.getElementById("json-file-input");
+    if (input) input.value = "";
+    safeLucide();
+  },
+
+  closeImportModal() {
+    const modal = document.getElementById("import-modal");
+    if (modal) modal.classList.add("hidden");
+  },
+
+  prosesImporJSON() {
+    const fileInput = document.getElementById("json-file-input");
+    const report = document.getElementById("import-report");
+    if (!fileInput || !fileInput.files.length) {
+      alert("Silakan pilih berkas JSON terlebih dahulu.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        const list = Array.isArray(parsed) ? parsed : (parsed.questions || parsed.bankSoal || []);
+
+        if (!Array.isArray(list) || list.length === 0) {
+          throw new Error("Format JSON tidak valid atau tidak memiliki daftar soal.");
+        }
+
+        const s = getStore();
+        const existingMap = new Map();
+        s.bankSoal.forEach(item => existingMap.set(item.id, item));
+
+        let ditambah = 0, diperbarui = 0;
+        list.forEach(item => {
+          if (!item.id || !item.question && !item.tanya) return;
+          const qId = String(item.id).trim().toUpperCase();
+          if (existingMap.has(qId)) {
+            diperbarui++;
+          } else {
+            ditambah++;
+          }
+          existingMap.set(qId, {
+            ...item,
+            id: qId,
+            verificationStatus: item.verificationStatus || "needs_review"
+          });
+        });
+
+        s.bankSoal = Array.from(existingMap.values());
+        saveStore(s);
+
+        report.className = "p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs";
+        report.innerHTML = `<strong>Berhasil:</strong> ${ditambah} soal baru ditambahkan, ${diperbarui} soal diperbarui.`;
+        report.classList.remove("hidden");
+
+        setTimeout(() => {
+          window.LMS.closeImportModal();
+          renderApp();
+        }, 1200);
+      } catch (err) {
+        report.className = "p-3 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 text-xs";
+        report.innerHTML = `<strong>Gagal:</strong> ${escapeHtml(err.message)}`;
+        report.classList.remove("hidden");
+      }
+    };
+    reader.readAsText(fileInput.files[0]);
   },
 
   eksporJSON() {
