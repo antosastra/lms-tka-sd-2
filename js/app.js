@@ -1,6 +1,7 @@
 /**
- * Kontroler Utama & Router LMS TKA SD — Fase 2.1
- * Mendukung Tipe Soal: PG, PGK_MCMA, PGK_KATEGORI, ISIAN + Impor/Ekspor JSON
+ * Kontroler Utama & Router LMS TKA SD
+ * Mendukung Multiformat: PG, PGK MCMA, PGK Kategori, Isian
+ * Mendukung Validasi & Impor Massal JSON
  */
 import { getStore, saveStore } from './store/localStore.js';
 import { DAFTAR_MATA_PELAJARAN } from './data/curriculum.js';
@@ -16,7 +17,7 @@ function safeLucide() {
       lucide.createIcons();
     }
   } catch (err) {
-    console.warn("Lucide ditunda:", err);
+    console.warn("Lucide deferred:", err);
   }
 }
 
@@ -32,7 +33,7 @@ function renderApp() {
     saveStore(store);
   }
 
-  // Bilah Navigasi Peran
+  // Header Navigasi Peran
   if (store.role === "anak") {
     nav.innerHTML = `
       <button onclick="window.LMS.navigate('#/anak/dashboard')" class="px-3 py-1.5 rounded-lg text-slate-700 hover:bg-slate-100 font-medium">Dashboard</button>
@@ -56,7 +57,7 @@ function renderApp() {
     `;
   }
 
-  // Routing Tampilan
+  // Routing Halaman
   if (hash.startsWith("#/masuk")) app.innerHTML = viewLogin(store);
   else if (hash.startsWith("#/anak/dashboard")) app.innerHTML = viewDashboardAnak(store);
   else if (hash.startsWith("#/anak/latihan")) app.innerHTML = viewHalamanLatihan(store);
@@ -71,7 +72,7 @@ function renderApp() {
   window.scrollTo(0, 0);
 }
 
-// ---------------- Komponen Tampilan ----------------
+// ---------------- Komponen Halaman ----------------
 function viewLogin(store) {
   return `
     <div class="max-w-xl mx-auto py-8">
@@ -94,7 +95,7 @@ function viewLogin(store) {
         </div>
       </div>
       <div class="mt-6 text-center">
-        <button onclick="window.LMS.pilihRole('admin')" class="text-xs text-slate-500 hover:text-slate-800 underline">Masuk ke Panel Pengelolaan & Kurasi Bank Soal</button>
+        <button onclick="window.LMS.pilihRole('admin')" class="text-xs text-slate-500 hover:text-slate-800 underline">Masuk ke Panel Manajemen Bank Soal</button>
       </div>
     </div>
   `;
@@ -111,8 +112,8 @@ function viewDashboardAnak(store) {
   const persen = Math.min(100, Math.round((menitTotal / targetMenit) * 100));
 
   const mapelList = store.mataPelajaran || DAFTAR_MATA_PELAJARAN;
-  const mapelTKA = mapelList.filter(m => m.kelompok === "tka" && m.aktif);
-  const mapelUAS = mapelList.filter(m => m.kelompok === "ujian_sekolah" && m.aktif);
+  const mapelTKA = mapelList.filter(m => (m.kelompok === "A" || m.kelompok === "tka"));
+  const mapelUAS = mapelList.filter(m => (m.kelompok === "B" || m.kelompok === "ujian_sekolah"));
 
   const hitungSoal = (subjectId) => {
     const list = (store.bankSoal || []).filter(q => (q.subjectId || (q.mapel === "Matematika" ? "matematika" : "bahasa-indonesia")) === subjectId);
@@ -163,7 +164,7 @@ function viewDashboardAnak(store) {
               <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div>
                   <div class="flex items-center justify-between mb-2">
-                    <span class="text-[10px] uppercase font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">${m.kurikulum}</span>
+                    <span class="text-[10px] uppercase font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">${m.nama}</span>
                     <span class="text-xs font-semibold ${stat.verified > 0 ? 'text-emerald-600' : 'text-slate-400'}">
                       ${stat.verified} Soal Terverifikasi ${stat.draft > 0 ? `<span class="text-slate-400 text-[10px]">(${stat.draft} draf)</span>` : ''}
                     </span>
@@ -232,7 +233,7 @@ function viewDashboardAnak(store) {
   `;
 }
 
-// --- VIEW: HALAMAN LATIHAN SOAL (MULTIFORMAT) ---
+// --- VIEW: LATIHAN SOAL ---
 function viewHalamanLatihan(store) {
   if (!store.sesiAktif?.soalList?.length) {
     return `
@@ -390,7 +391,7 @@ function renderInputInteraktifSoal(soal, ans) {
   return `
     <div class="space-y-1">
       <label class="block text-slate-700 text-xs font-semibold mb-1">Ketikkan jawaban Anda:</label>
-      <input type="text" value="${escapeHtml(ans || '')}" oninput="window.LMS.simpanIsian('${soal.id}', this.value)" placeholder="Tuliskan angka desimal atau kata kunci..." class="w-full px-3.5 py-2.5 border rounded-xl text-xs bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      <input type="text" value="${escapeHtml(ans || '')}" oninput="window.LMS.simpanIsian('${soal.id}', this.value)" placeholder="Tuliskan angka atau jawaban teks..." class="w-full px-3.5 py-2.5 border rounded-xl text-xs bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
     </div>
   `;
 }
@@ -402,9 +403,9 @@ function viewHasilSesi(store) {
 
   return `
     <div class="max-w-md mx-auto bg-white p-8 rounded-3xl border text-center space-y-4 shadow-sm">
-      <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider">Sesi Evaluasi Selesai</span>
+      <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider">Sesi Selesai</span>
       <h1 class="text-5xl font-black text-blue-600">${latest.skor}</h1>
-      <p class="text-xs text-slate-500">${latest.jumlahBenar} dari ${latest.totalSoal} Soal Terjawab Sempurna</p>
+      <p class="text-xs text-slate-500">${latest.jumlahBenar} dari ${latest.totalSoal} Soal Terjawab Benar</p>
       <div class="flex gap-2 pt-2">
         <button onclick="window.LMS.navigate('#/anak/pembahasan')" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm">Lihat Pembahasan</button>
         <button onclick="window.LMS.navigate('#/anak/dashboard')" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Dashboard</button>
@@ -413,7 +414,7 @@ function viewHasilSesi(store) {
   `;
 }
 
-// --- VIEW: PEMBAHASAN SOAL LENGKAP ---
+// --- VIEW: PEMBAHASAN LENGKAP ---
 function viewHalamanPembahasan(store) {
   const soalList = store.sesiAktif?.soalList || [];
   return `
@@ -484,7 +485,7 @@ function viewDashboardOrtu(store) {
   return `
     <div class="max-w-2xl mx-auto bg-white p-6 rounded-2xl border space-y-4 shadow-sm">
       <h1 class="text-lg font-bold text-purple-900">Pantauan Belajar: ${escapeHtml(store.anak.nama)}</h1>
-      <p class="text-xs text-slate-600">Total sesi mandiri yang terselesaikan: <strong>${store.riwayatSesi.length} Sesi</strong></p>
+      <p class="text-xs text-slate-600">Total sesi mandiri terselesaikan: <strong>${store.riwayatSesi.length} Sesi</strong></p>
       <div class="p-3.5 bg-purple-50 rounded-xl text-xs text-purple-900 border border-purple-100">
         <strong>Catatan Guru/Pendamping:</strong> ${escapeHtml(store.ortu.catatanRekomendasi)}
       </div>
@@ -492,18 +493,18 @@ function viewDashboardOrtu(store) {
   `;
 }
 
-// --- VIEW: JADWAL ASESMEN ---
+// --- VIEW: ASESMEN ---
 function viewEvaluasiSimulasi() {
   return `
     <div class="max-w-2xl mx-auto bg-white p-6 rounded-2xl border space-y-3 text-xs shadow-sm">
       <h1 class="text-base font-bold text-slate-900">Informasi Regulasi & Kalender Asesmen</h1>
       <p class="text-slate-600">• Asesmen Sumatif Akhir Jenjang (ASAJ SD): <strong>11 – 22 Mei 2027</strong></p>
-      <p class="text-slate-600">• Regulasi Acuan TKA: <strong>Peraturan Kepala BSKAP No. 047/H/AN/2025</strong></p>
+      <p class="text-slate-600">• Kerangka Asesmen TKA: <strong>Peraturan Kepala BSKAP No. 047/H/AN/2025</strong></p>
     </div>
   `;
 }
 
-// --- VIEW: PANEL ADMIN BANK SOAL (DENGAN TOMBOL IMPOR & EKSPOR) ---
+// --- VIEW: PANEL ADMIN ---
 function viewAdminKonten(store) {
   const bank = store.bankSoal || [];
   return `
@@ -571,9 +572,11 @@ function viewAdminKonten(store) {
   `;
 }
 
-// ---------------- Antarmuka Global LMS ----------------
+// ---------------- Antarmuka Global LMS (window.LMS) ----------------
 window.LMS = {
   navigate,
+  tempImportData: null,
+
   pilihRole(role) {
     const s = getStore();
     s.role = role;
@@ -611,7 +614,7 @@ window.LMS = {
     const valid = (s.bankSoal || []).filter(q => (q.subjectId || (q.mapel === "Matematika" ? "matematika" : "bahasa-indonesia")) === subjectId && q.topicId === topicId && q.verificationStatus === "verified");
 
     if (valid.length === 0) {
-      alert("Belum ada butir soal terverifikasi pada topik ini. Silakan setujui soal di menu Admin.");
+      alert("Belum ada butir soal terverifikasi pada topik ini. Silakan setujui butir soal di menu Admin.");
       return;
     }
     const sub = mapels.find(m => m.id === subjectId);
@@ -723,12 +726,21 @@ window.LMS = {
     }
   },
 
-  // Modal Admin Tambah / Edit
+  handleSubjectChange(subId) {
+    const mapels = DAFTAR_MATA_PELAJARAN;
+    const sub = mapels.find(m => m.id === subId);
+    const topSelect = document.getElementById("soal-topic-id");
+    if (topSelect && sub) {
+      topSelect.innerHTML = (sub.topik || []).map(t => `<option value="${t.id}">${escapeHtml(t.nama)}</option>`).join('');
+    }
+  },
+
   openAdminModal(soal = null) {
     const s = getStore();
     const mapels = s.mataPelajaran || DAFTAR_MATA_PELAJARAN;
     const modal = document.getElementById("admin-modal");
-    const subSelect = document.getElementById("soal-mapel");
+    const subSelect = document.getElementById("soal-subject-id") || document.getElementById("soal-mapel");
+    
     if (subSelect) {
       subSelect.innerHTML = mapels.map(m => `<option value="${m.id}">${escapeHtml(m.nama)}</option>`).join('');
     }
@@ -738,7 +750,14 @@ window.LMS = {
       document.getElementById("edit-original-id").value = soal.id;
       document.getElementById("soal-id").value = soal.id;
       document.getElementById("soal-id").disabled = true;
-      if (subSelect) subSelect.value = soal.subjectId || "matematika";
+      if (subSelect) {
+        subSelect.value = soal.subjectId || "matematika";
+        window.LMS.handleSubjectChange(subSelect.value);
+      }
+      const topSelect = document.getElementById("soal-topic-id");
+      if (topSelect && soal.topicId) topSelect.value = soal.topicId;
+
+      document.getElementById("soal-status").value = soal.verificationStatus || "needs_review";
       document.getElementById("soal-kompetensi").value = soal.competencyId || soal.kompetensi || "";
       document.getElementById("soal-kesulitan").value = soal.difficulty || "Dasar";
       const tipe = (soal.questionType || soal.tipe || "PG").toUpperCase();
@@ -765,6 +784,9 @@ window.LMS = {
       document.getElementById("soal-id").value = "";
       document.getElementById("soal-id").disabled = false;
       document.getElementById("form-soal").reset();
+      if (subSelect && subSelect.options.length > 0) {
+        window.LMS.handleSubjectChange(subSelect.options[0].value);
+      }
       window.LMS.toggleFormTipe("PG");
     }
     modal.classList.remove("hidden");
@@ -772,7 +794,8 @@ window.LMS = {
   },
 
   closeAdminModal() {
-    document.getElementById("admin-modal").classList.add("hidden");
+    const modal = document.getElementById("admin-modal");
+    if (modal) modal.classList.add("hidden");
   },
 
   toggleFormTipe(t) {
@@ -804,10 +827,10 @@ window.LMS = {
     let options = [], correctAnswer = "", alternatives = [];
     if (tipe === "PG") {
       options = [
-        document.getElementById("soal-opsi-a").value.trim(),
-        document.getElementById("soal-opsi-b").value.trim(),
-        document.getElementById("soal-opsi-c").value.trim(),
-        document.getElementById("soal-opsi-d").value.trim()
+        { id: "A", text: document.getElementById("soal-opsi-a").value.trim() },
+        { id: "B", text: document.getElementById("soal-opsi-b").value.trim() },
+        { id: "C", text: document.getElementById("soal-opsi-c").value.trim() },
+        { id: "D", text: document.getElementById("soal-opsi-d").value.trim() }
       ];
       correctAnswer = document.getElementById("soal-kunci-pg").value;
     } else {
@@ -815,10 +838,13 @@ window.LMS = {
       alternatives = document.getElementById("soal-alt-isian").value.split(",").map(x => x.trim()).filter(Boolean);
     }
 
+    const subSelect = document.getElementById("soal-subject-id") || document.getElementById("soal-mapel");
+    const topSelect = document.getElementById("soal-topic-id");
+
     const item = {
       id,
-      subjectId: document.getElementById("soal-mapel").value,
-      topicId: "umum",
+      subjectId: subSelect ? subSelect.value : "matematika",
+      topicId: topSelect ? topSelect.value : "umum",
       competencyId: document.getElementById("soal-kompetensi").value.trim(),
       grade: "6 SD",
       questionType: tipe,
@@ -830,7 +856,7 @@ window.LMS = {
       explanation: document.getElementById("soal-pembahasan").value.trim(),
       difficulty: document.getElementById("soal-kesulitan").value,
       source: "Input Manual Admin",
-      verificationStatus: "needs_review"
+      verificationStatus: document.getElementById("soal-status")?.value || "needs_review"
     };
 
     if (origId) {
@@ -845,51 +871,13 @@ window.LMS = {
     renderApp();
   },
 
-  // ---------------- FITUR IMPOR & EKSPOR JSON ----------------
-  openImportModal() {
-    let modal = document.getElementById("import-modal");
-    if (!modal) {
-      // Buat elemen modal secara otomatis jika belum ada di HTML
-      modal = document.createElement("div");
-      modal.id = "import-modal";
-      modal.className = "fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4";
-      modal.innerHTML = `
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border space-y-4">
-          <div class="flex justify-between items-center border-b pb-3">
-            <h3 class="font-extrabold text-slate-900 text-sm">Impor Berkas Bank Soal (JSON)</h3>
-            <button onclick="window.LMS.closeImportModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
-          </div>
-          <p class="text-xs text-slate-600">Pilih berkas <code>.json</code> yang berisi kumpulan butir soal terstruktur.</p>
-          <input type="file" id="json-file-input" accept=".json" class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 border p-2 rounded-xl">
-          <div id="import-report" class="hidden p-3 rounded-xl text-xs max-h-40 overflow-y-auto"></div>
-          <div class="flex justify-end gap-2 pt-2 border-t">
-            <button onclick="window.LMS.closeImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">Batal</button>
-            <button onclick="window.LMS.prosesImporJSON()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm">Mulai Impor</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    } else {
-      modal.classList.remove("hidden");
-    }
+  // ---------------- HANDLER IMPOR FILE JSON ----------------
+  handleImportFileSelect(input) {
+    const file = input && input.files && input.files[0];
+    const btnProses = document.querySelector("#modalImpor button:last-child, #import-modal button.bg-emerald-600, #import-modal button:last-child");
 
-    const report = document.getElementById("import-report");
-    if (report) report.classList.add("hidden");
-    const input = document.getElementById("json-file-input");
-    if (input) input.value = "";
-    safeLucide();
-  },
-
-  closeImportModal() {
-    const modal = document.getElementById("import-modal");
-    if (modal) modal.classList.add("hidden");
-  },
-
-  prosesImporJSON() {
-    const fileInput = document.getElementById("json-file-input");
-    const report = document.getElementById("import-report");
-    if (!fileInput || !fileInput.files.length) {
-      alert("Silakan pilih berkas JSON terlebih dahulu.");
+    if (!file) {
+      window.LMS.tempImportData = null;
       return;
     }
 
@@ -900,47 +888,98 @@ window.LMS = {
         const list = Array.isArray(parsed) ? parsed : (parsed.questions || parsed.bankSoal || []);
 
         if (!Array.isArray(list) || list.length === 0) {
-          throw new Error("Format JSON tidak valid atau tidak memiliki daftar soal.");
+          alert("Format JSON tidak valid: Berkas harus berupa array butir soal atau memiliki properti 'questions'.");
+          if (btnProses) {
+            btnProses.disabled = true;
+            btnProses.classList.add("opacity-50", "cursor-not-allowed");
+          }
+          return;
         }
 
-        const s = getStore();
-        const existingMap = new Map();
-        s.bankSoal.forEach(item => existingMap.set(item.id, item));
+        window.LMS.tempImportData = list;
 
-        let ditambah = 0, diperbarui = 0;
-        list.forEach(item => {
-          if (!item.id || !item.question && !item.tanya) return;
-          const qId = String(item.id).trim().toUpperCase();
-          if (existingMap.has(qId)) {
-            diperbarui++;
-          } else {
-            ditambah++;
-          }
-          existingMap.set(qId, {
-            ...item,
-            id: qId,
-            verificationStatus: item.verificationStatus || "needs_review"
-          });
-        });
-
-        s.bankSoal = Array.from(existingMap.values());
-        saveStore(s);
-
-        report.className = "p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs";
-        report.innerHTML = `<strong>Berhasil:</strong> ${ditambah} soal baru ditambahkan, ${diperbarui} soal diperbarui.`;
-        report.classList.remove("hidden");
-
-        setTimeout(() => {
-          window.LMS.closeImportModal();
-          renderApp();
-        }, 1200);
+        // Buka status tombol Proses Impor
+        if (btnProses) {
+          btnProses.disabled = false;
+          btnProses.classList.remove("opacity-50", "cursor-not-allowed");
+          btnProses.classList.remove("bg-blue-300");
+          btnProses.classList.add("bg-blue-600");
+        }
       } catch (err) {
-        report.className = "p-3 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 text-xs";
-        report.innerHTML = `<strong>Gagal:</strong> ${escapeHtml(err.message)}`;
-        report.classList.remove("hidden");
+        alert("Sintaks JSON tidak valid: " + err.message);
+        if (btnProses) {
+          btnProses.disabled = true;
+          btnProses.classList.add("opacity-50", "cursor-not-allowed");
+        }
       }
     };
-    reader.readAsText(fileInput.files[0]);
+    reader.readAsText(file);
+  },
+
+  openImportModal() {
+    const modal = document.getElementById("import-modal") || document.getElementById("modalImpor");
+    if (modal) modal.classList.remove("hidden");
+    window.LMS.tempImportData = null;
+    safeLucide();
+  },
+
+  closeImportModal() {
+    const modal = document.getElementById("import-modal") || document.getElementById("modalImpor");
+    if (modal) modal.classList.add("hidden");
+  },
+
+  // Mendukung panggilan prosesImporJSON maupun eksekusiImporBankSoal
+  prosesImporJSON() {
+    window.LMS.eksekusiImporBankSoal();
+  },
+
+  eksekusiImporBankSoal() {
+    const rawList = window.LMS.tempImportData;
+    if (!rawList || !Array.isArray(rawList) || rawList.length === 0) {
+      alert("Silakan pilih berkas JSON butir soal terlebih dahulu.");
+      return;
+    }
+
+    const policyElem = document.getElementById("kebijakanDuplikat") || document.getElementById("import-conflict-policy");
+    const policy = policyElem ? policyElem.value : "skip";
+
+    const s = getStore();
+    const existingMap = new Map();
+    s.bankSoal.forEach(q => existingMap.set(String(q.id).trim().toUpperCase(), q));
+
+    let ditambah = 0, dilewati = 0, ditimpa = 0;
+
+    rawList.forEach(item => {
+      const qId = item.id ? String(item.id).trim().toUpperCase() : null;
+      if (!qId) return;
+
+      const normalized = {
+        ...item,
+        id: qId,
+        verificationStatus: item.verificationStatus || "needs_review"
+      };
+
+      if (existingMap.has(qId)) {
+        if (policy === "overwrite" || policy === "replace") {
+          existingMap.set(qId, normalized);
+          ditimpa++;
+        } else {
+          dilewati++;
+        }
+      } else {
+        existingMap.set(qId, normalized);
+        ditambah++;
+      }
+    });
+
+    s.bankSoal = Array.from(existingMap.values());
+    saveStore(s);
+
+    alert(`Impor Selesai!\n• Ditambahkan: ${ditambah} soal\n• Dilewati (Duplikat): ${dilewati} soal\n• Diperbarui: ${ditimpa} soal`);
+
+    window.LMS.tempImportData = null;
+    window.LMS.closeImportModal();
+    renderApp();
   },
 
   eksporJSON() {
@@ -948,7 +987,7 @@ window.LMS = {
     const payload = {
       schemaVersion: 2,
       exportedAt: new Date().toISOString(),
-      bankSoal: s.bankSoal
+      questions: s.bankSoal
     };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
     const a = document.createElement('a');
@@ -960,14 +999,14 @@ window.LMS = {
   },
 
   resetData() {
-    if (confirm("Reset seluruh data LocalStorage ke bawaan awal?")) {
+    if (confirm("Reset seluruh data LocalStorage ke setelan awal bawaan?")) {
       localStorage.removeItem("LMS_TKA_SD_STATE_V1_1");
       location.reload();
     }
   }
 };
 
-// Inisialisasi Aplikasi
+// Inisialisasi Siklus Hidup Router
 window.addEventListener("hashchange", renderApp);
 
 if (document.readyState === "loading") {
