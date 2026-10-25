@@ -1,6 +1,3 @@
-/**
- * Utilitas Sanitasi, Pemeriksaan Jawaban, dan Validasi Skema JSON
- */
 export function escapeHtml(str) {
   if (str === null || str === undefined) return "";
   return String(str)
@@ -28,7 +25,6 @@ export function periksaJawaban(soal, inputUser) {
     return { status: isBenar ? "BENAR" : "SALAH", isBenar };
   }
 
-  // Normalisasi Isian: ubah tanda koma menjadi titik desimal
   const normInput = raw.toLowerCase().replace(/\.$/, "").replace(/,/g, ".");
   const normKunci = String(kunci).toLowerCase().replace(/\.$/, "").replace(/,/g, ".");
 
@@ -58,12 +54,9 @@ export function periksaJawaban(soal, inputUser) {
   return { status: "SALAH", isBenar: false };
 }
 
-/**
- * Validasi Skema JSON Impor Bank Soal
- */
 export function validasiSkemaBankSoal(jsonArray, validSubjectIds = []) {
   if (!Array.isArray(jsonArray)) {
-    return { valid: false, message: "Struktur root JSON harus berupa Array daftar soal." };
+    return { valid: false, message: "Struktur root JSON harus berupa Array." };
   }
 
   const validStatuses = ["draft", "needs_review", "verified", "archived"];
@@ -86,7 +79,7 @@ export function validasiSkemaBankSoal(jsonArray, validSubjectIds = []) {
     }
 
     if (seenIds.has(id)) {
-      errors.push(`Baris #${baris}: Duplikasi ID '${id}' ditemukan di dalam file.`);
+      errors.push(`Baris #${baris}: Duplikasi ID '${id}'.`);
       return;
     }
     seenIds.add(id);
@@ -94,10 +87,6 @@ export function validasiSkemaBankSoal(jsonArray, validSubjectIds = []) {
     const subjectId = String(item.subjectId || "").trim();
     if (!subjectId) {
       errors.push(`Soal ${id}: 'subjectId' wajib diisi.`);
-      return;
-    }
-    if (validSubjectIds.length > 0 && !validSubjectIds.includes(subjectId)) {
-      errors.push(`Soal ${id}: 'subjectId' (${subjectId}) tidak terdaftar dalam konfigurasi mata pelajaran.`);
       return;
     }
 
@@ -109,19 +98,13 @@ export function validasiSkemaBankSoal(jsonArray, validSubjectIds = []) {
 
     const question = String(item.question || item.tanya || "").trim();
     if (!question) {
-      errors.push(`Soal ${id}: Teks pertanyaan ('question') tidak boleh kosong.`);
+      errors.push(`Soal ${id}: Pertanyaan tidak boleh kosong.`);
       return;
     }
 
     const correctAnswer = String(item.correctAnswer || item.kunci || "").trim();
     if (!correctAnswer) {
-      errors.push(`Soal ${id}: Kunci jawaban ('correctAnswer') wajib diisi.`);
-      return;
-    }
-
-    const verificationStatus = String(item.verificationStatus || "draft").toLowerCase();
-    if (!validStatuses.includes(verificationStatus)) {
-      errors.push(`Soal ${id}: 'verificationStatus' tidak valid (${verificationStatus}).`);
+      errors.push(`Soal ${id}: Kunci jawaban wajib diisi.`);
       return;
     }
 
@@ -140,7 +123,7 @@ export function validasiSkemaBankSoal(jsonArray, validSubjectIds = []) {
       explanation: String(item.explanation || item.pembahasan || "").trim(),
       difficulty: String(item.difficulty || item.kesulitan || "Dasar").trim(),
       source: String(item.source || "Impor Eksternal").trim(),
-      verificationStatus,
+      verificationStatus: String(item.verificationStatus || "draft").toLowerCase(),
       createdAt: item.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     });
