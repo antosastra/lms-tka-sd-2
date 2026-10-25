@@ -1,0 +1,42 @@
+export function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+export function periksaJawaban(soal, inputUser) {
+  if (inputUser === undefined || inputUser === null) return { status: "KOSONG", isBenar: false };
+  const raw = String(inputUser).trim();
+  if (raw === "") return { status: "KOSONG", isBenar: false };
+
+  if (soal.tipe === "PG") {
+    const isBenar = (raw.toUpperCase() === soal.kunci.toUpperCase());
+    return { status: isBenar ? "BENAR" : "SALAH", isBenar };
+  }
+
+  // Normalisasi Isian: ubah koma jadi titik
+  const normInput = raw.toLowerCase().replace(/\.$/, "").replace(/,/g, ".");
+  const normKunci = String(soal.kunci).toLowerCase().replace(/\.$/, "").replace(/,/g, ".");
+
+  const numInput = parseFloat(normInput);
+  const numKunci = parseFloat(normKunci);
+
+  if (!isNaN(numInput) && !isNaN(numKunci) && normInput.replace(/[a-z\s]/g, "") === String(numInput)) {
+    if (Math.abs(numInput - numKunci) < 0.0001) return { status: "BENAR", isBenar: true };
+  }
+
+  if (normInput === normKunci) return { status: "BENAR", isBenar: true };
+
+  if (Array.isArray(soal.alternatifKunci)) {
+    for (const alt of soal.alternatifKunci) {
+      const normAlt = String(alt).toLowerCase().trim().replace(/\.$/, "").replace(/,/g, ".");
+      if (normInput === normAlt) return { status: "BENAR", isBenar: true };
+    }
+  }
+
+  return { status: "SALAH", isBenar: false };
+}
