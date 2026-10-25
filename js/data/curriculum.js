@@ -1,134 +1,113 @@
 /**
- * Master Data Kurikulum & Mata Pelajaran LMS TKA SD
- * Mendukung konfigurasi multi-mapel untuk Persiapan TKA dan Ujian Sekolah.
+ * Konfigurasi Kurikulum & Mata Pelajaran LMS TKA SD
  */
 export const DAFTAR_MATA_PELAJARAN = [
-  // Kelompok A: Persiapan TKA
+  // Kelompok A — Persiapan TKA
   {
     id: "matematika",
     nama: "Matematika",
-    kelompok: "tka",
-    kelompokLabel: "Persiapan TKA",
-    deskripsi: "Domain Bilangan, Geometri, Pengukuran, dan Penalaran Data.",
-    kelas: "6 SD",
-    kurikulum: "Kurikulum Merdeka / Standar TKA",
-    aktif: true,
+    kelompok: "A",
+    deskripsi: "Bilangan, Geometri & Pengukuran, serta Analisis Data.",
+    ikon: "calculator",
+    warna: "blue",
     topik: [
-      { id: "mat-bilangan", nama: "Bilangan & Operasi Hitung", kompetensiId: "KOMP-MAT-01" },
-      { id: "mat-geometri", nama: "Geometri & Pengukuran", kompetensiId: "KOMP-MAT-02" },
-      { id: "mat-data", nama: "Data & Analisis", kompetensiId: "KOMP-MAT-03" }
+      { id: "mat-bilangan", nama: "Bilangan & Operasi Hitung" },
+      { id: "mat-geometri", nama: "Geometri & Pengukuran" },
+      { id: "mat-data", nama: "Pengolahan & Penyajian Data" }
     ]
   },
   {
     id: "bahasa-indonesia",
     nama: "Bahasa Indonesia",
-    kelompok: "tka",
-    kelompokLabel: "Persiapan TKA",
-    deskripsi: "Literasi Membaca: Teks Informasi faktual dan Teks Fiksi naratif.",
-    kelas: "6 SD",
-    kurikulum: "Kurikulum Merdeka / Standar TKA",
-    aktif: true,
+    kelompok: "A",
+    deskripsi: "Teks Informasi Faktual, Sastra Fiksi, dan Struktur Kebahasaan.",
+    ikon: "book-open",
+    warna: "indigo",
     topik: [
-      { id: "ind-informasi", nama: "Teks Informasi (Faktual)", kompetensiId: "KOMP-IND-01" },
-      { id: "ind-fiksi", nama: "Teks Sastra & Fiksi", kompetensiId: "KOMP-IND-02" }
+      { id: "ind-informasi", nama: "Teks Informasi (Literasi Membaca)" },
+      { id: "ind-fiksi", nama: "Teks Fiksi & Nilai Moral" },
+      { id: "ind-bahasa", nama: "Tata Bahasa & Kalimat Efektif" }
     ]
   },
 
-  // Kelompok B: Persiapan Ujian Sekolah
+  // Kelompok B — Persiapan Ujian Akhir Sekolah
   {
     id: "ipas",
     nama: "IPAS",
-    kelompok: "ujian_sekolah",
-    kelompokLabel: "Ujian Akhir Sekolah",
-    deskripsi: "Ilmu Pengetahuan Alam dan Sosial tingkat dasar.",
-    kelas: "6 SD",
-    kurikulum: "Kurikulum Merdeka",
-    aktif: true,
+    kelompok: "B",
+    deskripsi: "Ekosistem Lingkungan, Gejala Alam, dan Kehidupan Sosial.",
+    ikon: "compass",
+    warna: "emerald",
     topik: [
-      { id: "ipas-alam", nama: "Sistem Tubuh & Ekosistem", kompetensiId: "KOMP-IPAS-01" },
-      { id: "ipas-sosial", nama: "Geografi & Sejarah Lokal", kompetensiId: "KOMP-IPAS-02" }
+      { id: "ipas-ekosistem", nama: "Ekosistem & Keseimbangan Lingkungan" },
+      { id: "ipas-energi", nama: "Energi & Perubahannya" }
     ]
   },
   {
     id: "pendidikan-pancasila",
     nama: "Pendidikan Pancasila",
-    kelompok: "ujian_sekolah",
-    kelompokLabel: "Ujian Akhir Sekolah",
-    deskripsi: "Nilai Pancasila, Norma, Hak, Kewajiban, dan Keberagaman.",
-    kelas: "6 SD",
-    kurikulum: "Kurikulum Merdeka",
-    aktif: true,
+    kelompok: "B",
+    deskripsi: "Penerapan Nilai Pancasila, Norma, Hak, dan Kewajiban Warga Negara.",
+    ikon: "shield-check",
+    warna: "amber",
     topik: [
-      { id: "pancasila-dasar", nama: "Penerapan Sila Pancasila", kompetensiId: "KOMP-PAN-01" },
-      { id: "pancasila-hukum", nama: "Aturan & Norma Kehidupan", kompetensiId: "KOMP-PAN-02" }
+      { id: "pan-nilai", nama: "Penerapan Sila Pancasila" },
+      { id: "pan-norma", nama: "Norma & Hukum di Masyarakat" }
     ]
   },
   {
     id: "bahasa-inggris",
     nama: "Bahasa Inggris",
-    kelompok: "ujian_sekolah",
-    kelompokLabel: "Ujian Akhir Sekolah",
-    deskripsi: "Kosakata fungsional, percakapan sederhana, dan deskripsi teks pendek.",
-    kelas: "6 SD",
-    kurikulum: "Kurikulum Merdeka",
-    aktif: true,
+    kelompok: "B",
+    deskripsi: "Reading Comprehension, Vocabulary, and Basic Contextual Grammar.",
+    ikon: "languages",
+    warna: "sky",
     topik: [
-      { id: "ing-vocab", nama: "Vocabulary & Daily Life", kompetensiId: "KOMP-ENG-01" },
-      { id: "ing-reading", nama: "Short Functional Reading", kompetensiId: "KOMP-ENG-02" }
+      { id: "ing-reading", nama: "Reading Comprehension" }
     ]
   },
   {
     id: "pendidikan-agama",
     nama: "Pendidikan Agama & Budi Pekerti",
-    kelompok: "ujian_sekolah",
-    kelompokLabel: "Ujian Akhir Sekolah",
-    deskripsi: "Ajaran agama, akhlak terpuji, dan moderasi beragama.",
-    kelas: "6 SD",
-    kurikulum: "Kurikulum Merdeka",
-    aktif: true,
+    kelompok: "B",
+    deskripsi: "Nilai Spiritual, Akhlak Mulia, dan Toleransi Beragama.",
+    ikon: "heart-handshake",
+    warna: "teal",
     topik: [
-      { id: "agm-akhlak", nama: "Budi Pekerti & Karakter", kompetensiId: "KOMP-AGM-01" }
+      { id: "agm-akhlak", nama: "Budi Pekerti & Akhlak Mulia" }
     ]
   },
   {
     id: "pjok",
     nama: "PJOK",
-    kelompok: "ujian_sekolah",
-    kelompokLabel: "Ujian Akhir Sekolah",
-    deskripsi: "Kebugaran jasmani, gerak manipulatif, dan pola hidup sehat.",
-    kelas: "6 SD",
-    kurikulum: "Kurikulum Merdeka",
-    aktif: true,
+    kelompok: "B",
+    deskripsi: "Pola Hidup Sehat, Kebugaran Jasmani, dan Keselamatan Diri.",
+    ikon: "activity",
+    warna: "orange",
     topik: [
-      { id: "pjok-kebugaran", nama: "Aktivitas Kebugaran & Senam", kompetensiId: "KOMP-PJK-01" },
-      { id: "pjok-kesehatan", nama: "Kesehatan Pribadi & Nutrisi", kompetensiId: "KOMP-PJK-02" }
+      { id: "pjk-kesehatan", nama: "Pola Hidup Sehat & Kebugaran" }
     ]
   },
   {
     id: "seni-budaya",
     nama: "Seni Budaya",
-    kelompok: "ujian_sekolah",
-    kelompokLabel: "Ujian Akhir Sekolah",
-    deskripsi: "Seni rupa, musik, tari, dan kerajinan berbasis kearifan lokal.",
-    kelas: "6 SD",
-    kurikulum: "Kurikulum Merdeka",
-    aktif: true,
+    kelompok: "B",
+    deskripsi: "Apresiasi Karya Seni Rupa, Musik, dan Ragam Budaya Daerah.",
+    ikon: "palette",
+    warna: "rose",
     topik: [
-      { id: "seni-rupa", nama: "Unsur Seni Rupa & Pola Hias", kompetensiId: "KOMP-SNI-01" },
-      { id: "seni-musik", nama: "Tangga Nada & Alat Musik Daerah", kompetensiId: "KOMP-SNI-02" }
+      { id: "sni-karya", nama: "Apresiasi Ragam Budaya" }
     ]
   },
   {
     id: "muatan-lokal",
     nama: "Muatan Lokal",
-    kelompok: "ujian_sekolah",
-    kelompokLabel: "Ujian Akhir Sekolah",
-    deskripsi: "Bahasa daerah dan kebudayaan sesuai kurikulum satuan pendidikan.",
-    kelas: "6 SD",
-    kurikulum: "Kurikulum Sekolah",
-    aktif: true,
+    kelompok: "B",
+    deskripsi: "Bahasa Daerah dan Pengetahuan Kebudayaan Daerah Setempat.",
+    ikon: "map-pin",
+    warna: "purple",
     topik: [
-      { id: "mulok-bahasa", nama: "Bahasa & Sastra Daerah", kompetensiId: "KOMP-MLK-01" }
+      { id: "mulok-daerah", nama: "Kearifan Lokal" }
     ]
   }
 ];
