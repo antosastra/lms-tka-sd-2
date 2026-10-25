@@ -1,1 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS TKA SD — Adaptive Learning & Exam Readiness</title>
+  <!-- Tailwind CSS & Lucide Icons via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' } }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
 
+  <aside class="bg-amber-100 border-b border-amber-300 text-amber-900 px-4 py-2 text-xs font-medium text-center flex items-center justify-center gap-2">
+    <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 flex-shrink-0"></i>
+    <span><strong>FASE 1.1 PROTOTYPE:</strong> Data bank soal berstatus draf AI internal (bukan soal resmi kementerian).</span>
+  </aside>
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="window.LMS.navigate('#/masuk')">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-blue-200">TKA</div>
+        <div>
+          <span class="font-extrabold text-slate-900 tracking-tight block text-base leading-none">LMS TKA SD</span>
+          <span class="text-[11px] text-slate-500 font-medium">Uji Coba 2027</span>
+        </div>
+      </div>
+      <nav id="nav-actions" class="flex items-center gap-2 text-xs md:text-sm"></nav>
+    </div>
+  </header>
+
+  <main id="app-root" class="max-w-6xl mx-auto px-4 py-6 w-full flex-1"></main>
+
+  <!-- Modal Admin Tambah/Edit Soal -->
+  <div id="admin-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 id="modal-title" class="text-lg font-bold text-slate-900">Form Butir Soal Draf</h3>
+        <button onclick="window.LMS.closeAdminModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div id="modal-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold"></div>
+      <form id="form-soal" onsubmit="window.LMS.handleSaveSoal(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="edit-original-id" value="">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">ID Soal *</label>
+            <input type="text" id="soal-id" placeholder="MAT-BIL-004" class="w-full px-3 py-2 border rounded-xl" required>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Mata Pelajaran *</label>
+            <select id="soal-mapel" class="w-full px-3 py-2 border rounded-xl" required>
+              <option value="Matematika">Matematika</option>
+              <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Kompetensi *</label>
+          <input type="text" id="soal-kompetensi" class="w-full px-3 py-2 border rounded-xl" required>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Tipe Soal *</label>
+            <select id="soal-tipe" onchange="window.LMS.toggleFormTipe(this.value)" class="w-full px-3 py-2 border rounded-xl">
+              <option value="PG">Pilihan Ganda (PG)</option>
+              <option value="ISIAN">Isian Singkat</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Tingkat Kesulitan *</label>
+            <select id="soal-kesulitan" class="w-full px-3 py-2 border rounded-xl">
+              <option value="Dasar">Dasar</option>
+              <option value="Menengah">Menengah</option>
+              <option value="Lanjut">Lanjut</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Stimulus / Bacaan (Opsional)</label>
+          <textarea id="soal-stimulus" rows="3" class="w-full px-3 py-2 border rounded-xl"></textarea>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Pertanyaan *</label>
+          <textarea id="soal-tanya" rows="2" class="w-full px-3 py-2 border rounded-xl" required></textarea>
+        </div>
+        <div id="pg-fields" class="space-y-2 bg-slate-50 p-3 rounded-xl border">
+          <label class="block font-bold text-slate-700">Opsi Pilihan Ganda (A, B, C, D) *</label>
+          <input type="text" id="soal-opsi-a" placeholder="A. Opsi A" class="w-full px-3 py-1.5 border rounded-lg bg-white">
+          <input type="text" id="soal-opsi-b" placeholder="B. Opsi B" class="w-full px-3 py-1.5 border rounded-lg bg-white">
+          <input type="text" id="soal-opsi-c" placeholder="C. Opsi C" class="w-full px-3 py-1.5 border rounded-lg bg-white">
+          <input type="text" id="soal-opsi-d" placeholder="D. Opsi D" class="w-full px-3 py-1.5 border rounded-lg bg-white">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1 mt-2">Kunci PG *</label>
+            <select id="soal-kunci-pg" class="w-full px-3 py-2 border rounded-xl bg-white">
+              <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+            </select>
+          </div>
+        </div>
+        <div id="isian-fields" class="hidden space-y-2 bg-slate-50 p-3 rounded-xl border">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Kunci Isian *</label>
+            <input type="text" id="soal-kunci-isian" placeholder="Contoh: 1.5 atau waspada" class="w-full px-3 py-2 border rounded-xl bg-white">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Alternatif Kunci (Pisahkan koma)</label>
+            <input type="text" id="soal-alt-isian" placeholder="1,5, hati-hati" class="w-full px-3 py-2 border rounded-xl bg-white">
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Pembahasan *</label>
+          <textarea id="soal-pembahasan" rows="3" class="w-full px-3 py-2 border rounded-xl" required></textarea>
+        </div>
+        <div class="pt-3 border-t flex justify-end gap-2">
+          <button type="button" onclick="window.LMS.closeAdminModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md">Simpan Soal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>LMS TKA SD — Modular GitHub Pages</p>
+      <div class="flex gap-4">
+        <button onclick="window.LMS.resetData()" class="text-rose-600 hover:underline">Reset Data Demo</button>
+        <a href="#/admin" class="hover:text-blue-600 font-semibold">Admin Bank Soal</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
