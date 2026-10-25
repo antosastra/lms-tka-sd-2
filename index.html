@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LMS TKA SD — Multi-Subject & Adaptive Learning</title>
+  <title>LMS TKA SD — Adaptive Learning & Exam Readiness</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="css/styles.css">
   <script>
     tailwind.config = {
       theme: {
@@ -23,69 +23,59 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <aside class="bg-amber-100 border-b border-amber-300 text-amber-900 px-4 py-2 text-xs font-medium text-center flex items-center justify-center gap-2">
-    <i data-lucide="info" class="w-4 h-4 text-amber-700 flex-shrink-0"></i>
-    <span><strong>FASE 1.1:</strong> Multi-Subject Foundation & Bank Soal. Hanya butir soal berstatus <strong>Verified</strong> yang dapat dikerjakan siswa.</span>
+  <!-- Banner Status Fase 2 -->
+  <aside class="bg-indigo-900 border-b border-indigo-950 text-indigo-100 px-4 py-2 text-xs font-medium text-center flex items-center justify-center gap-2">
+    <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400 flex-shrink-0"></i>
+    <span><strong>FASE 2 AKTIF:</strong> Sistem Manajemen Bank Soal & Kurasi Terverifikasi (Client-Side GitHub Pages).</span>
   </aside>
 
+  <!-- Header Navigasi -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3 cursor-pointer" onclick="window.LMS.navigate('#/masuk')">
         <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-blue-200">TKA</div>
         <div>
           <span class="font-extrabold text-slate-900 tracking-tight block text-base leading-none">LMS TKA SD</span>
-          <span class="text-[11px] text-slate-500 font-medium">Uji Coba 2027 • Multi-Mapel</span>
+          <span class="text-[11px] text-slate-500 font-medium">Ujian 2027</span>
         </div>
       </div>
       <nav id="nav-actions" class="flex items-center gap-2 text-xs md:text-sm"></nav>
     </div>
   </header>
 
+  <!-- Konten Utama Aplikasi -->
   <main id="app-root" class="max-w-6xl mx-auto px-4 py-6 w-full flex-1"></main>
 
-  <!-- Modal Admin: Tambah / Edit Butir Soal -->
+  <!-- 1. Modal Tambah/Edit Soal -->
   <div id="admin-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 id="modal-title" class="text-lg font-bold text-slate-900">Form Butir Soal</h3>
+        <h3 id="modal-title" class="text-base font-bold text-slate-900">Form Butir Soal</h3>
         <button onclick="window.LMS.closeAdminModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div id="modal-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold"></div>
-      <form id="form-soal" onsubmit="window.LMS.handleSaveSoal(event)" class="space-y-4 text-xs">
+      <form id="form-soal" onsubmit="window.LMS.handleSaveSoal(event)" class="space-y-3.5 text-xs">
         <input type="hidden" id="edit-original-id" value="">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block font-bold text-slate-700 mb-1">ID Soal *</label>
-            <input type="text" id="soal-id" placeholder="MAT-BIL-004" class="w-full px-3 py-2 border rounded-xl" required>
+            <input type="text" id="soal-id" placeholder="IPAS-EKO-002" class="w-full px-3 py-2 border rounded-xl font-mono uppercase" required>
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Mata Pelajaran *</label>
-            <select id="soal-subject-id" onchange="window.LMS.handleSubjectChange(this.value)" class="w-full px-3 py-2 border rounded-xl" required></select>
+            <select id="soal-mapel" class="w-full px-3 py-2 border rounded-xl" required></select>
           </div>
         </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Topik Pembelajaran *</label>
-            <select id="soal-topic-id" class="w-full px-3 py-2 border rounded-xl" required></select>
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Status Verifikasi *</label>
-            <select id="soal-status" class="w-full px-3 py-2 border rounded-xl">
-              <option value="draft">Draf (Draft)</option>
-              <option value="needs_review">Perlu Ditinjau (Needs Review)</option>
-              <option value="verified">Terverifikasi (Verified)</option>
-              <option value="archived">Diarsipkan (Archived)</option>
-            </select>
-          </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Kompetensi / Tujuan Pembelajaran *</label>
+          <input type="text" id="soal-kompetensi" placeholder="Contoh: Menghitung Keliling Persegi Panjang" class="w-full px-3 py-2 border rounded-xl" required>
         </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Tipe Soal *</label>
             <select id="soal-tipe" onchange="window.LMS.toggleFormTipe(this.value)" class="w-full px-3 py-2 border rounded-xl">
               <option value="PG">Pilihan Ganda (PG)</option>
-              <option value="ISIAN">Isian Singkat</option>
+              <option value="ISIAN">Jawaban Singkat</option>
             </select>
           </div>
           <div>
@@ -96,51 +86,64 @@
               <option value="Lanjut">Lanjut</option>
             </select>
           </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Status Verifikasi *</label>
+            <select id="soal-status" class="w-full px-3 py-2 border rounded-xl font-semibold">
+              <option value="draft">Draf (draft)</option>
+              <option value="needs_review">Perlu Ditinjau</option>
+              <option value="verified">Terverifikasi</option>
+              <option value="archived">Diarsipkan</option>
+            </select>
+          </div>
         </div>
-
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Kompetensi Diukur *</label>
-          <input type="text" id="soal-kompetensi" placeholder="Operasi Hitung Campuran" class="w-full px-3 py-2 border rounded-xl" required>
+          <label class="block font-bold text-slate-700 mb-1">Sumber Materi / Buku Referensi</label>
+          <input type="text" id="soal-sumber" placeholder="Contoh: Buku Tematik Kelas 6 Hal 45" class="w-full px-3 py-2 border rounded-xl">
         </div>
-
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Stimulus / Wacana (Opsional)</label>
-          <textarea id="soal-stimulus" rows="3" class="w-full px-3 py-2 border rounded-xl" placeholder="Teks wacana..."></textarea>
+          <label class="block font-bold text-slate-700 mb-1">Stimulus / Teks Wacana (Opsional)</label>
+          <textarea id="soal-stimulus" rows="3" placeholder="Teks bacaan, data tabel, atau pengantar soal cerita..." class="w-full px-3 py-2 border rounded-xl"></textarea>
         </div>
-
         <div>
           <label class="block font-bold text-slate-700 mb-1">Pertanyaan *</label>
           <textarea id="soal-tanya" rows="2" class="w-full px-3 py-2 border rounded-xl" required></textarea>
         </div>
 
+        <!-- Bagian Opsi PG -->
         <div id="pg-fields" class="space-y-2 bg-slate-50 p-3 rounded-xl border">
           <label class="block font-bold text-slate-700">Pilihan Jawaban (A, B, C, D) *</label>
-          <input type="text" id="soal-opsi-a" placeholder="A. Opsi A" class="w-full px-3 py-1.5 border rounded-lg bg-white">
-          <input type="text" id="soal-opsi-b" placeholder="B. Opsi B" class="w-full px-3 py-1.5 border rounded-lg bg-white">
-          <input type="text" id="soal-opsi-c" placeholder="C. Opsi C" class="w-full px-3 py-1.5 border rounded-lg bg-white">
-          <input type="text" id="soal-opsi-d" placeholder="D. Opsi D" class="w-full px-3 py-1.5 border rounded-lg bg-white">
-          <div class="pt-1">
+          <input type="text" id="soal-opsi-a" placeholder="Pilihan A" class="w-full px-3 py-1.5 border rounded-lg bg-white" required>
+          <input type="text" id="soal-opsi-b" placeholder="Pilihan B" class="w-full px-3 py-1.5 border rounded-lg bg-white" required>
+          <input type="text" id="soal-opsi-c" placeholder="Pilihan C" class="w-full px-3 py-1.5 border rounded-lg bg-white">
+          <input type="text" id="soal-opsi-d" placeholder="Pilihan D" class="w-full px-3 py-1.5 border rounded-lg bg-white">
+          <div class="pt-2">
             <label class="block font-bold text-slate-700 mb-1">Kunci Jawaban PG *</label>
-            <select id="soal-kunci-pg" class="w-full px-3 py-2 border rounded-xl bg-white">
+            <select id="soal-kunci-pg" class="w-full px-3 py-2 border rounded-xl bg-white font-bold text-blue-600">
               <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
             </select>
           </div>
         </div>
 
+        <!-- Bagian Opsi Isian -->
         <div id="isian-fields" class="hidden space-y-2 bg-slate-50 p-3 rounded-xl border">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Kunci Isian *</label>
+            <label class="block font-bold text-slate-700 mb-1">Kunci Jawaban Utama *</label>
             <input type="text" id="soal-kunci-isian" placeholder="Contoh: 1.5 atau waspada" class="w-full px-3 py-2 border rounded-xl bg-white">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Alternatif Kunci (Pisahkan tanda koma)</label>
-            <input type="text" id="soal-alt-isian" placeholder="1,5, waspada, hati-hati" class="w-full px-3 py-2 border rounded-xl bg-white">
+            <label class="block font-bold text-slate-700 mb-1">Alternatif Kunci yang Sah (Pisahkan dengan koma)</label>
+            <input type="text" id="soal-alt-isian" placeholder="1,5, hati-hati, waspada" class="w-full px-3 py-2 border rounded-xl bg-white">
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Langkah Pembahasan *</label>
+          <label class="block font-bold text-slate-700 mb-1">Pembahasan Langkah demi Langkah *</label>
           <textarea id="soal-pembahasan" rows="3" class="w-full px-3 py-2 border rounded-xl" required></textarea>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Catatan Penelaah / Reviewer</label>
+          <input type="text" id="soal-catatan" placeholder="Catatan perbaikan atau validasi..." class="w-full px-3 py-2 border rounded-xl">
         </div>
 
         <div class="pt-3 border-t flex justify-end gap-2">
@@ -151,34 +154,114 @@
     </div>
   </div>
 
-  <!-- Modal Admin: Impor JSON -->
-  <div id="import-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs">
+  <!-- 2. Modal Checklist Review Kualitas -->
+  <div id="review-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b pb-3">
-        <h3 class="text-base font-bold text-slate-900">Impor Bank Soal (JSON)</h3>
-        <button onclick="window.LMS.closeImportModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <h3 class="text-base font-bold text-slate-900">Checklist Audit Mutu Soal (<span id="review-soal-id" class="font-mono text-blue-600"></span>)</h3>
+        <button onclick="window.LMS.closeReviewModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <p class="text-slate-600">Pilih berkas JSON daftar butir soal. Format skema dan ID divalidasi sebelum disimpan.</p>
-      <input type="file" id="json-file-input" accept=".json" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-      <div id="import-report" class="hidden p-3 rounded-xl border max-h-48 overflow-y-auto"></div>
-      <div class="pt-2 border-t flex justify-end gap-2">
-        <button type="button" onclick="window.LMS.closeImportModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold">Tutup</button>
-        <button type="button" onclick="window.LMS.prosesImporJSON()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md">Terapkan Impor</button>
+      <input type="hidden" id="review-soal-target-id">
+      
+      <div class="p-3.5 bg-slate-50 rounded-2xl border text-xs space-y-2">
+        <p><strong>Pertanyaan:</strong> <span id="review-soal-pertanyaan"></span></p>
+        <p><strong>Kunci Jawaban:</strong> <span id="review-soal-kunci" class="font-bold text-emerald-700 font-mono"></span></p>
+        <p><strong>Pembahasan:</strong> <span id="review-soal-pembahasan" class="text-slate-600"></span></p>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold text-slate-800">12 Kriteria Verifikasi Mutu Konten:</h4>
+        <div id="review-checklist-items" class="space-y-2 bg-slate-50 p-3.5 rounded-2xl border max-h-56 overflow-y-auto"></div>
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 text-xs mb-1">Catatan Penelaah Tambahan:</label>
+        <input type="text" id="review-input-catatan" class="w-full px-3 py-2 border rounded-xl text-xs" placeholder="Hasil verifikasi rumus/teks...">
+      </div>
+
+      <div class="pt-3 border-t flex justify-end gap-2 text-xs">
+        <button onclick="window.LMS.closeReviewModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold">Batal</button>
+        <button onclick="window.LMS.handleApproveReview()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md">
+          Setujui & Tandai Terverifikasi
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- 3. Modal Impor JSON -->
+  <div id="import-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="text-base font-bold text-slate-900">Impor Massal Bank Soal (JSON)</h3>
+        <button onclick="window.LMS.closeImportModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Kebijakan Konflik ID Duplikat:</label>
+          <select id="import-policy" class="w-full px-3 py-2 border rounded-xl bg-white">
+            <option value="skip">Lewati butir yang ID-nya sudah ada (Rekomendasi)</option>
+            <option value="update">Perbarui isi butir yang ID-nya cocok</option>
+            <option value="reject_all">Batalkan seluruh impor jika ditemukan ID ganda</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Pilih File Berkas JSON:</label>
+          <input type="file" id="import-file-input" accept=".json" onchange="window.LMS.handleImportFileSelect(event)" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+        </div>
+        <div id="import-preview-result" class="hidden"></div>
+      </div>
+      <div class="pt-3 border-t flex justify-end gap-2 text-xs">
+        <button onclick="window.LMS.closeImportModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold">Batal</button>
+        <button id="btn-commit-import" disabled onclick="window.LMS.commitImport()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md disabled:opacity-40 disabled:cursor-not-allowed">
+          Proses Impor
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Modal Ekspor JSON -->
+  <div id="export-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="text-base font-bold text-slate-900">Ekspor Cadangan Bank Soal (JSON)</h3>
+        <button onclick="window.LMS.closeExportModal()" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Pilih Mata Pelajaran:</label>
+          <select id="export-filter-subject" class="w-full px-3 py-2 border rounded-xl bg-white"></select>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Pilih Status Verifikasi:</label>
+          <select id="export-filter-status" class="w-full px-3 py-2 border rounded-xl bg-white">
+            <option value="all">Semua Status</option>
+            <option value="verified">Hanya Terverifikasi</option>
+            <option value="needs_review">Hanya Perlu Ditinjau</option>
+            <option value="draft">Hanya Draf</option>
+          </select>
+        </div>
+        <p class="text-slate-500 text-[11px]">Berkas JSON yang diunduh berstandar <code>schemaVersion: 1</code> dan dapat diimpor kembali ke LMS.</p>
+      </div>
+      <div class="pt-3 border-t flex justify-end gap-2 text-xs">
+        <button onclick="window.LMS.closeExportModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold">Batal</button>
+        <button onclick="window.LMS.executeExport()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md">
+          Unduh File JSON
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Navigasi -->
   <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
     <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-      <p>LMS TKA SD — Fase 1.1 Multi-Subject</p>
+      <p>LMS TKA SD — Fase 2 (Modular GitHub Pages)</p>
       <div class="flex gap-4">
-        <button onclick="window.LMS.resetData()" class="text-rose-600 hover:underline">Reset Data Demo</button>
+        <button onclick="window.LMS.resetData()" class="text-rose-600 hover:underline">Reset LocalStorage</button>
         <a href="#/admin" class="hover:text-blue-600 font-semibold">Admin Bank Soal</a>
       </div>
     </div>
   </footer>
 
-  <!-- Pemanggilan Modul Utama dengan Jalur Relatif Aman -->
-  <script type="module" src="./js/app.js"></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
