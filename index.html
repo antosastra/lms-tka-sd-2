@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LMS TKA SD — Adaptive Learning & Exam Readiness</title>
+  <title>LMS TKA SD — Multi-Subject & Adaptive Learning</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,8 +24,8 @@
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
 
   <aside class="bg-amber-100 border-b border-amber-300 text-amber-900 px-4 py-2 text-xs font-medium text-center flex items-center justify-center gap-2">
-    <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 flex-shrink-0"></i>
-    <span><strong>FASE 1.1 PROTOTYPE:</strong> Data bank soal berstatus draf AI internal (bukan soal resmi kementerian).</span>
+    <i data-lucide="info" class="w-4 h-4 text-amber-700 flex-shrink-0"></i>
+    <span><strong>FASE 1.1:</strong> Multi-Subject Foundation & Bank Soal Terverifikasi. Hanya soal terverifikasi yang muncul di latihan siswa.</span>
   </aside>
 
   <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
@@ -34,7 +34,7 @@
         <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-blue-200">TKA</div>
         <div>
           <span class="font-extrabold text-slate-900 tracking-tight block text-base leading-none">LMS TKA SD</span>
-          <span class="text-[11px] text-slate-500 font-medium">Uji Coba 2027</span>
+          <span class="text-[11px] text-slate-500 font-medium">Uji Coba 2027 • Multi-Mapel</span>
         </div>
       </div>
       <nav id="nav-actions" class="flex items-center gap-2 text-xs md:text-sm"></nav>
@@ -43,11 +43,11 @@
 
   <main id="app-root" class="max-w-6xl mx-auto px-4 py-6 w-full flex-1"></main>
 
-  <!-- Modal Admin Tambah/Edit Soal -->
+  <!-- Modal Admin: Tambah / Edit Butir Soal -->
   <div id="admin-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 id="modal-title" class="text-lg font-bold text-slate-900">Form Butir Soal Draf</h3>
+        <h3 id="modal-title" class="text-lg font-bold text-slate-900">Form Butir Soal</h3>
         <button onclick="window.LMS.closeAdminModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div id="modal-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold"></div>
@@ -60,16 +60,26 @@
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Mata Pelajaran *</label>
-            <select id="soal-mapel" class="w-full px-3 py-2 border rounded-xl" required>
-              <option value="Matematika">Matematika</option>
-              <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+            <select id="soal-subject-id" onchange="window.LMS.handleSubjectChange(this.value)" class="w-full px-3 py-2 border rounded-xl" required></select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Topik Pembelajaran *</label>
+            <select id="soal-topic-id" class="w-full px-3 py-2 border rounded-xl" required></select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Status Verifikasi *</label>
+            <select id="soal-status" class="w-full px-3 py-2 border rounded-xl">
+              <option value="draft">Draf (Baru dibuat)</option>
+              <option value="needs_review">Perlu Ditinjau (Needs Review)</option>
+              <option value="verified">Terverifikasi (Verified)</option>
+              <option value="archived">Diarsipkan (Archived)</option>
             </select>
           </div>
         </div>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Kompetensi *</label>
-          <input type="text" id="soal-kompetensi" class="w-full px-3 py-2 border rounded-xl" required>
-        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Tipe Soal *</label>
@@ -87,41 +97,52 @@
             </select>
           </div>
         </div>
+
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Stimulus / Bacaan (Opsional)</label>
-          <textarea id="soal-stimulus" rows="3" class="w-full px-3 py-2 border rounded-xl"></textarea>
+          <label class="block font-bold text-slate-700 mb-1">Kompetensi / Kemampuan Diukur *</label>
+          <input type="text" id="soal-kompetensi" placeholder="Operasi Hitung Campuran" class="w-full px-3 py-2 border rounded-xl" required>
         </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Stimulus / Wacana (Opsional)</label>
+          <textarea id="soal-stimulus" rows="3" class="w-full px-3 py-2 border rounded-xl" placeholder="Teks bacaan atau cerita pengantar..."></textarea>
+        </div>
+
         <div>
           <label class="block font-bold text-slate-700 mb-1">Pertanyaan *</label>
           <textarea id="soal-tanya" rows="2" class="w-full px-3 py-2 border rounded-xl" required></textarea>
         </div>
+
         <div id="pg-fields" class="space-y-2 bg-slate-50 p-3 rounded-xl border">
-          <label class="block font-bold text-slate-700">Opsi Pilihan Ganda (A, B, C, D) *</label>
+          <label class="block font-bold text-slate-700">Pilihan Jawaban (A, B, C, D) *</label>
           <input type="text" id="soal-opsi-a" placeholder="A. Opsi A" class="w-full px-3 py-1.5 border rounded-lg bg-white">
           <input type="text" id="soal-opsi-b" placeholder="B. Opsi B" class="w-full px-3 py-1.5 border rounded-lg bg-white">
           <input type="text" id="soal-opsi-c" placeholder="C. Opsi C" class="w-full px-3 py-1.5 border rounded-lg bg-white">
           <input type="text" id="soal-opsi-d" placeholder="D. Opsi D" class="w-full px-3 py-1.5 border rounded-lg bg-white">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1 mt-2">Kunci PG *</label>
+          <div class="pt-1">
+            <label class="block font-bold text-slate-700 mb-1">Kunci Jawaban PG *</label>
             <select id="soal-kunci-pg" class="w-full px-3 py-2 border rounded-xl bg-white">
               <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
             </select>
           </div>
         </div>
+
         <div id="isian-fields" class="hidden space-y-2 bg-slate-50 p-3 rounded-xl border">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Kunci Isian *</label>
             <input type="text" id="soal-kunci-isian" placeholder="Contoh: 1.5 atau waspada" class="w-full px-3 py-2 border rounded-xl bg-white">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Alternatif Kunci (Pisahkan koma)</label>
-            <input type="text" id="soal-alt-isian" placeholder="1,5, hati-hati" class="w-full px-3 py-2 border rounded-xl bg-white">
+            <label class="block font-bold text-slate-700 mb-1">Alternatif Kunci Disetujui (Pisahkan dengan tanda koma)</label>
+            <input type="text" id="soal-alt-isian" placeholder="1,5, waspada, berhati-hati" class="w-full px-3 py-2 border rounded-xl bg-white">
           </div>
         </div>
+
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Pembahasan *</label>
+          <label class="block font-bold text-slate-700 mb-1">Langkah Pembahasan *</label>
           <textarea id="soal-pembahasan" rows="3" class="w-full px-3 py-2 border rounded-xl" required></textarea>
         </div>
+
         <div class="pt-3 border-t flex justify-end gap-2">
           <button type="button" onclick="window.LMS.closeAdminModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold">Batal</button>
           <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md">Simpan Soal</button>
@@ -130,9 +151,29 @@
     </div>
   </div>
 
+  <!-- Modal Admin: Impor JSON -->
+  <div id="import-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="text-base font-bold text-slate-900">Impor Bank Soal (Format JSON)</h3>
+        <button onclick="window.LMS.closeImportModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <p class="text-slate-600">Pilih berkas <code>.json</code> yang berisi array soal. Struktur dan ID akan divalidasi sebelum disimpan.</p>
+      
+      <input type="file" id="json-file-input" accept=".json" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+      
+      <div id="import-report" class="hidden p-3 rounded-xl border max-h-48 overflow-y-auto"></div>
+
+      <div class="pt-2 border-t flex justify-end gap-2">
+        <button type="button" onclick="window.LMS.closeImportModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold">Tutup</button>
+        <button type="button" onclick="window.LMS.prosesImporJSON()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md">Validasi & Terapkan</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
     <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-      <p>LMS TKA SD — Modular GitHub Pages</p>
+      <p>LMS TKA SD — Fase 1.1 Multi-Subject</p>
       <div class="flex gap-4">
         <button onclick="window.LMS.resetData()" class="text-rose-600 hover:underline">Reset Data Demo</button>
         <a href="#/admin" class="hover:text-blue-600 font-semibold">Admin Bank Soal</a>
@@ -140,835 +181,6 @@
     </div>
   </footer>
 
-  <!-- Script Inline yang Kebal terhadap Error Path Subfolder GitHub Pages -->
-  <script>
-    const INITIAL_BANK_SOAL = [
-      {
-        id: "MAT-BIL-001",
-        mapel: "Matematika",
-        kompetensi: "Operasi Hitung Campuran Bilangan Cacah",
-        kesulitan: "Dasar",
-        tipe: "PG",
-        stimulus: "Sebuah koperasi sekolah memiliki persediaan 8 kotak buku tulis. Setiap kotak berisi 24 buku. Pada hari Senin, koperasi tersebut menjual 45 buku. Sisa buku yang belum terjual kemudian dibagikan secara merata kepada 3 ruang kelas untuk kegiatan literasi.",
-        tanya: "Berapa banyak buku yang diterima oleh masing-masing ruang kelas?",
-        opsi: ["A. 49 buku", "B. 53 buku", "C. 63 buku", "D. 147 buku"],
-        kunci: "A",
-        alternatifKunci: [],
-        pembahasan: "Total buku = 8 × 24 = 192 buku. Sisa buku setelah terjual = 192 - 45 = 147 buku. Bagian per kelas = 147 ÷ 3 = 49 buku.",
-        tagKesalahan: "[ERR_URUTAN_OPERASI]",
-        statusVerifikasi: "Draf AI — Perlu Verifikasi Manusia"
-      },
-      {
-        id: "MAT-BIL-002",
-        mapel: "Matematika",
-        kompetensi: "Aritmetika Sosial Berbasis Tabel Transaksi",
-        kesulitan: "Dasar",
-        tipe: "PG",
-        stimulus: "Tabel Belanja Perlengkapan:<br/>• 4 Pensil 2B: @ Rp2.500<br/>• 2 Penghapus: @ Rp3.000<br/>• 1 Penggaris: @ Rp5.000<br/>Dimas membayar total belanjaan tersebut dengan uang Rp50.000.",
-        tanya: "Berapakah uang kembalian yang harus diterima Dimas?",
-        opsi: ["A. Rp21.000", "B. Rp29.000", "C. Rp31.000", "D. Rp39.500"],
-        kunci: "B",
-        alternatifKunci: [],
-        pembahasan: "Biaya: (4×2.500) + (2×3.000) + (1×5.000) = 10.000 + 6.000 + 5.000 = Rp21.000. Kembalian: 50.000 - 21.000 = Rp29.000.",
-        tagKesalahan: "[ERR_PERTANYAAN_TERBALIK]",
-        statusVerifikasi: "Draf AI — Perlu Verifikasi Manusia"
-      },
-      {
-        id: "MAT-BIL-003",
-        mapel: "Matematika",
-        kompetensi: "Pecahan & Pembagian Kontekstual",
-        kesulitan: "Menengah",
-        tipe: "ISIAN",
-        stimulus: "Ibu memiliki persediaan 2,5 kg tepung terigu. Sebanyak 3/5 bagian digunakan untuk membuat bolu kukus.",
-        tanya: "Berapa kilogram tepung terigu yang digunakan Ibu? (Tulis dalam desimal, misal: 1.5 atau 1,5)",
-        kunci: "1.5",
-        alternatifKunci: ["1,5", "1.5 kg", "1,5 kg"],
-        pembahasan: "Tepung digunakan = 2,5 kg × (3/5) = 2,5 × 0,6 = 1,5 kg.",
-        tagKesalahan: "[ERR_OPERASI_PECAHAN]",
-        statusVerifikasi: "Draf AI — Perlu Verifikasi Manusia"
-      },
-      {
-        id: "MAT-GEO-001",
-        mapel: "Matematika",
-        kompetensi: "Keliling Bangun Datar Tertutup",
-        kesulitan: "Menengah",
-        tipe: "PG",
-        stimulus: "Sebuah taman kota berbentuk persegi panjang berukuran panjang 24 m dan lebar 16 m. Di sekeliling batas tepi taman akan dipasangi tiang lampu dengan jarak antartiang 4 m.",
-        tanya: "Berapa banyak tiang lampu yang dibutuhkan untuk mengelilingi batas taman?",
-        opsi: ["A. 10 tiang", "B. 20 tiang", "C. 24 tiang", "D. 96 tiang"],
-        kunci: "B",
-        alternatifKunci: [],
-        pembahasan: "Keliling = 2 × (24 + 16) = 2 × 40 = 80 m. Karena keliling adalah lintasan tertutup, banyak tiang = 80 ÷ 4 = 20 tiang.",
-        tagKesalahan: "[ERR_RUMUS_KELILING]",
-        statusVerifikasi: "Draf AI — Perlu Verifikasi Manusia"
-      },
-      {
-        id: "MAT-GEO-002",
-        mapel: "Matematika",
-        kompetensi: "Volume Balok & Konversi Satuan Debit",
-        kesulitan: "Lanjut",
-        tipe: "PG",
-        stimulus: "Bak penampungan berbentuk balok berukuran 120 cm × 80 cm × 100 cm. Awalnya terisi air 1/4 bagian dari kapasitas totalnya. Lalu diisi keran berdebit 15 liter/menit hingga penuh.",
-        tanya: "Berapa lama waktu yang diperlukan untuk mengisi sisa ruang bak hingga penuh?",
-        opsi: ["A. 16 menit", "B. 48 menit", "C. 64 menit", "D. 72 menit"],
-        kunci: "B",
-        alternatifKunci: [],
-        pembahasan: "Volume total = 120×80×100 = 960.000 cm³ = 960 liter. Sisa ruang kosong = 3/4 × 960 = 720 liter. Waktu = 720 ÷ 15 = 48 menit.",
-        tagKesalahan: "[ERR_KAPASITAS_AWAL]",
-        statusVerifikasi: "Draf AI — Perlu Verifikasi Manusia"
-      },
-      {
-        id: "IND-INF-001",
-        mapel: "Bahasa Indonesia",
-        kompetensi: "Informasi Tersurat Teks Faktual",
-        kesulitan: "Dasar",
-        tipe: "PG",
-        stimulus: "<strong>Hutan Mangrove: Benteng Alami Pesisir</strong><br/>Akar mangrove yang rapat berfungsi sebagai pemecah gelombang alami. Keberadaan jalinan akar ini mampu memperlambat arus ombak sehingga mencegah terjadinya abrasi atau pengikisan daratan oleh air laut.",
-        tanya: "Apa fungsi fisik dari jalinan akar mangrove bagi daratan pesisir?",
-        opsi: ["A. Menjadi tempat bertelur udang", "B. Memperlambat arus gelombang untuk mencegah abrasi", "C. Menyerap limbah plastik di laut", "D. Tempat bersarang burung"],
-        kunci: "B",
-        alternatifKunci: [],
-        pembahasan: "Tersurat jelas pada teks: jalinan akar memperlambat arus gelombang sehingga mencegah abrasi.",
-        tagKesalahan: "[ERR_LOKASI_INFORMASI]",
-        statusVerifikasi: "Draf AI — Perlu Verifikasi Manusia"
-      },
-      {
-        id: "IND-INF-002",
-        mapel: "Bahasa Indonesia",
-        kompetensi: "Hubungan Sebab-Akibat Ekologis",
-        kesulitan: "Menengah",
-        tipe: "PG",
-        stimulus: "<strong>Dampak Kerusakan Kawasan Bakau</strong><br/>Hutan mangrove di pesisir berfungsi ganda: sebagai pemecah abrasi dan habitat pemijahan bibit ikan. Apabila alih fungsi lahan tambak komersial merusak vegetasi bakau, perakaran pelindung akan lenyap. Dampak langsung bagi fauna laut perairan dangkal adalah hilangnya kawasan aman untuk memijah dan berlindung dari predator alami.",
-        tanya: "Berdasarkan teks di atas, apakah akibat utama kerusakan vegetasi bakau bagi fauna laut di perairan dangkal?",
-        opsi: ["A. Ombak pantai menjadi tenang", "B. Pasang surut air laut berhenti berganti", "C. Bibit ikan kehilangan area pemijahan dan perlindungan", "D. Populasi pemangsa air tawar bertambah pesat"],
-        kunci: "C",
-        alternatifKunci: [],
-        pembahasan: "Stimulus menyatakan kerusakan bakau melenyapkan perakaran pelindung sehingga bibit ikan kehilangan habitat memijah dan tempat berlindung.",
-        tagKesalahan: "[ERR_INFERENSI_SEBAB_AKIBAT]",
-        statusVerifikasi: "Draf AI — Perlu Verifikasi Manusia"
-      },
-      {
-        id: "IND-INF-003",
-        mapel: "Bahasa Indonesia",
-        kompetensi: "Ide Pokok Paragraf",
-        kesulitan: "Menengah",
-        tipe: "PG",
-        stimulus: "Gerakan daur ulang sampah plastik di lingkungan sekolah dasar mulai digalakkan. Siswa diajarkan memilah sampah organik dan non-organik ke dalam tempat sampah terpisah. Hasil pilahan plastik kemudian dikreasikan menjadi pot tanaman hias dan tempat pensil serbaguna di ruang kelas.",
-        tanya: "Ide pokok dari paragraf di atas adalah...",
-        opsi: ["A. Pemanfaatan botol bekas", "B. Pelaksanaan gerakan daur ulang sampah plastik di sekolah", "C. Pengadaan tempat sampah khusus", "D. Langkah menanam bunga hias"],
-        kunci: "B",
-        alternatifKunci: [],
-        pembahasan: "Kalimat utama berada di awal paragraf (deduktif): Gerakan daur ulang sampah plastik di lingkungan sekolah dasar mulai digalakkan.",
-        tagKesalahan: "[ERR_KALIMAT_UTAMA]",
-        statusVerifikasi: "Draf AI — Perlu Verifikasi Manusia"
-      },
-      {
-        id: "IND-FIK-001",
-        mapel: "Bahasa Indonesia",
-        kompetensi: "Watak Tokoh & Latar Narasi",
-        kesulitan: "Dasar",
-        tipe: "PG",
-        stimulus: "Meskipun hujan deras mengguyur desa sore itu, Doni tetap mengayuh sepedanya menuju balai desa. Ia tidak ingin adik-adik di taman bacaan kecewa menunggu buku dongeng yang sudah ia janjikan untuk dibawa tepat waktu.",
-        tanya: "Watak tokoh Doni yang tercermin dalam kutipan cerita di atas adalah...",
-        opsi: ["A. Cepat putus asa", "B. Amanah dan bertanggung jawab", "C. Keras kepala dan ceroboh", "D. Pemalu dan tertutup"],
-        kunci: "B",
-        alternatifKunci: [],
-        pembahasan: "Tindakan Doni tetap mengantar buku yang dijanjikan meski diterpa hujan lebat mencerminkan integritas, rasa tanggung jawab, dan amanah.",
-        tagKesalahan: "[ERR_WATAK_TOKOH]",
-        statusVerifikasi: "Draf AI — Perlu Verifikasi Manusia"
-      },
-      {
-        id: "IND-FIK-002",
-        mapel: "Bahasa Indonesia",
-        kompetensi: "Amanat Cerita Narasi",
-        kesulitan: "Menengah",
-        tipe: "ISIAN",
-        stimulus: "Kancil tergesa-gesa melompat ke seberang parit tanpa memperhatikan peringatan Kura-kura bahwa titian kayu tersebut sudah lapuk. Akibatnya, kayu patah dan kaki Kancil terperosok ke dalam kubangan lumpur.",
-        tanya: "Sebutkan satu kata sifat (nasihat kehati-hatian) yang diabaikan oleh tokoh Kancil sehingga mengalami celaka: (Contoh: waspada / hati-hati)",
-        kunci: "waspada",
-        alternatifKunci: ["waspada", "kewaspadaan", "hati-hati", "berhati-hati", "kehati-hatian", "sabar"],
-        pembahasan: "Kancil tergesa-gesa dan mengabaikan peringatan keselamatan sehingga menunjukkan kurangnya sikap waspada atau kehati-hatian.",
-        tagKesalahan: "[ERR_SIMPULAN_AMANAT]",
-        statusVerifikasi: "Draf AI — Perlu Verifikasi Manusia"
-      }
-    ];
-
-    const STORE_KEY = "LMS_TKA_SD_STATE_V1_1";
-
-    function getDefaultState() {
-      return {
-        role: "anak",
-        anak: { nama: "Rian (Siswa Uji)", kelas: "6 SD", targetMenit: 60 },
-        ortu: { nama: "Bpk. Hendra", catatanRekomendasi: "Fokuskan pendampingan pada ketelitian membaca petunjuk soal dan konversi satuan debit." },
-        bankSoal: INITIAL_BANK_SOAL,
-        riwayatSoal: {
-          "MAT-BIL-002": { totalAttempt: 1, totalCorrect: 0, isScheduledSpaced: true },
-          "MAT-GEO-002": { totalAttempt: 1, totalCorrect: 1, isScheduledSpaced: true }
-        },
-        riwayatSesi: [],
-        sesiAktif: null,
-        jawabanSesiAktif: {},
-        sesiSudahDisimpan: false
-      };
-    }
-
-    function getStore() {
-      try {
-        const raw = localStorage.getItem(STORE_KEY);
-        if (!raw) {
-          const fresh = getDefaultState();
-          saveStore(fresh);
-          return fresh;
-        }
-        const parsed = JSON.parse(raw);
-        if (!parsed || !Array.isArray(parsed.bankSoal)) throw new Error("Data rusak");
-        return parsed;
-      } catch (e) {
-        const fallback = getDefaultState();
-        saveStore(fallback);
-        return fallback;
-      }
-    }
-
-    function saveStore(state) {
-      try {
-        localStorage.setItem(STORE_KEY, JSON.stringify(state));
-      } catch (e) {
-        console.error("Gagal simpan ke storage:", e);
-      }
-    }
-
-    function escapeHtml(str) {
-      if (!str) return "";
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function periksaJawaban(soal, inputUser) {
-      if (inputUser === undefined || inputUser === null) return { status: "KOSONG", isBenar: false };
-      const raw = String(inputUser).trim();
-      if (raw === "") return { status: "KOSONG", isBenar: false };
-
-      if (soal.tipe === "PG") {
-        const isBenar = (raw.toUpperCase() === soal.kunci.toUpperCase());
-        return { status: isBenar ? "BENAR" : "SALAH", isBenar };
-      }
-
-      const normInput = raw.toLowerCase().replace(/\.$/, "").replace(/,/g, ".");
-      const normKunci = String(soal.kunci).toLowerCase().replace(/\.$/, "").replace(/,/g, ".");
-
-      const numInput = parseFloat(normInput);
-      const numKunci = parseFloat(normKunci);
-
-      if (!isNaN(numInput) && !isNaN(numKunci) && normInput.replace(/[a-z\s]/g, "") === String(numInput)) {
-        if (Math.abs(numInput - numKunci) < 0.0001) return { status: "BENAR", isBenar: true };
-      }
-
-      if (normInput === normKunci) return { status: "BENAR", isBenar: true };
-
-      if (Array.isArray(soal.alternatifKunci)) {
-        for (const alt of soal.alternatifKunci) {
-          const normAlt = String(alt).toLowerCase().trim().replace(/\.$/, "").replace(/,/g, ".");
-          if (normInput === normAlt) return { status: "BENAR", isBenar: true };
-        }
-      }
-
-      return { status: "SALAH", isBenar: false };
-    }
-
-    function navigate(hash) {
-      window.location.hash = hash;
-    }
-
-    function renderApp() {
-      const hash = window.location.hash || "#/anak/dashboard";
-      const app = document.getElementById("app-root");
-      const nav = document.getElementById("nav-actions");
-      const store = getStore();
-
-      if (store.role === "anak") {
-        nav.innerHTML = `
-          <button onclick="window.LMS.navigate('#/anak/dashboard')" class="px-3 py-1.5 rounded-lg text-slate-700 hover:bg-slate-100 font-medium">Dashboard</button>
-          <button onclick="window.LMS.navigate('#/anak/rencana')" class="px-3 py-1.5 rounded-lg text-slate-700 hover:bg-slate-100 font-medium">Rencana</button>
-          <button onclick="window.LMS.navigate('#/asesmen')" class="px-3 py-1.5 rounded-lg text-slate-700 hover:bg-slate-100 font-medium">Simulasi</button>
-          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 ml-2">Peran: Siswa</span>
-          <button onclick="window.LMS.navigate('#/masuk')" class="text-slate-400 hover:text-slate-600 ml-1"><i data-lucide="log-out" class="w-4 h-4"></i></button>
-        `;
-      } else if (store.role === "ortu") {
-        nav.innerHTML = `
-          <button onclick="window.LMS.navigate('#/ortu/dashboard')" class="px-3 py-1.5 rounded-lg text-slate-700 hover:bg-slate-100 font-medium">Pantauan Anak</button>
-          <button onclick="window.LMS.navigate('#/asesmen')" class="px-3 py-1.5 rounded-lg text-slate-700 hover:bg-slate-100 font-medium">Jadwal Ujian</button>
-          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 ml-2">Peran: Orang Tua</span>
-          <button onclick="window.LMS.navigate('#/masuk')" class="text-slate-400 hover:text-slate-600 ml-1"><i data-lucide="log-out" class="w-4 h-4"></i></button>
-        `;
-      } else {
-        nav.innerHTML = `
-          <button onclick="window.LMS.navigate('#/admin')" class="px-3 py-1.5 rounded-lg text-slate-700 hover:bg-slate-100 font-medium">Manajemen Bank Soal</button>
-          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 ml-2">Peran: Penelaah</span>
-          <button onclick="window.LMS.navigate('#/masuk')" class="text-slate-400 hover:text-slate-600 ml-1"><i data-lucide="log-out" class="w-4 h-4"></i></button>
-        `;
-      }
-
-      if (hash.startsWith("#/masuk")) app.innerHTML = viewLogin(store);
-      else if (hash.startsWith("#/anak/dashboard")) app.innerHTML = viewDashboardAnak(store);
-      else if (hash.startsWith("#/anak/rencana")) app.innerHTML = viewRencanaBelajar();
-      else if (hash.startsWith("#/anak/materi")) app.innerHTML = viewMateriPembelajaran();
-      else if (hash.startsWith("#/anak/latihan")) app.innerHTML = viewHalamanLatihan(store);
-      else if (hash.startsWith("#/anak/pembahasan")) app.innerHTML = viewHalamanPembahasan(store);
-      else if (hash.startsWith("#/anak/hasil")) app.innerHTML = viewHasilSesi(store);
-      else if (hash.startsWith("#/ortu/dashboard")) app.innerHTML = viewDashboardOrtu(store);
-      else if (hash.startsWith("#/asesmen")) app.innerHTML = viewEvaluasiSimulasi();
-      else if (hash.startsWith("#/admin")) app.innerHTML = viewAdminKonten(store);
-      else app.innerHTML = `<div class="text-center py-12"><button onclick="window.LMS.navigate('#/masuk')" class="px-4 py-2 bg-blue-600 text-white rounded-xl">Ke Beranda</button></div>`;
-
-      if (window.lucide) lucide.createIcons();
-      window.scrollTo(0, 0);
-    }
-
-    function viewLogin(store) {
-      return `
-        <div class="max-w-xl mx-auto py-8">
-          <div class="text-center mb-8">
-            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">Selamat Datang di LMS TKA SD</h1>
-            <p class="text-sm text-slate-600 mt-2">Pilih simulasi peran pengguna untuk eksplorasi prototype.</p>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div onclick="window.LMS.pilihRole('anak')" class="bg-white p-6 rounded-2xl border-2 ${store.role === 'anak' ? 'border-blue-600 shadow-md' : 'border-slate-200'} hover:border-blue-500 cursor-pointer text-center flex flex-col items-center">
-              <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4"><i data-lucide="book-open" class="w-8 h-8"></i></div>
-              <h2 class="font-bold text-lg text-slate-900">Siswa (Kelas 6)</h2>
-              <p class="text-xs text-slate-500 mt-1 mb-4">Latihan adaptif berimbang Matematika & B. Indonesia.</p>
-              <span class="mt-auto inline-block text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg">Masuk Sebagai Siswa</span>
-            </div>
-            <div onclick="window.LMS.pilihRole('ortu')" class="bg-white p-6 rounded-2xl border-2 ${store.role === 'ortu' ? 'border-purple-600 shadow-md' : 'border-slate-200'} hover:border-purple-500 cursor-pointer text-center flex flex-col items-center">
-              <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4"><i data-lucide="users" class="w-8 h-8"></i></div>
-              <h2 class="font-bold text-lg text-slate-900">Orang Tua</h2>
-              <p class="text-xs text-slate-500 mt-1 mb-4">Pantau ringkasan hasil latihan yang tersimpan.</p>
-              <span class="mt-auto inline-block text-xs font-semibold text-purple-600 bg-purple-50 px-3 py-1.5 rounded-lg">Masuk Sebagai Orang Tua</span>
-            </div>
-          </div>
-          <div class="mt-6 text-center">
-            <button onclick="window.LMS.pilihRole('admin')" class="text-xs text-slate-500 hover:text-slate-800 underline">Buka Panel Penelaah / Admin Draf Bank Soal</button>
-          </div>
-        </div>
-      `;
-    }
-
-    function viewDashboardAnak(store) {
-      const riwayat = store.riwayatSesi || [];
-      let menitTotal = 0, benarTotal = 0;
-      riwayat.forEach(s => {
-        menitTotal += (s.estimasiMenit || 15);
-        benarTotal += s.jumlahBenar;
-      });
-      const targetMenit = store.anak.targetMenit || 60;
-      const persen = Math.min(100, Math.round((menitTotal / targetMenit) * 100));
-
-      return `
-        <div class="space-y-6">
-          <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-3xl p-6 md:p-8 shadow-lg">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <span class="text-xs uppercase tracking-wider font-semibold bg-white/20 px-3 py-1 rounded-full">Persiapan Ujian 2027</span>
-                <h1 class="text-2xl md:text-3xl font-extrabold mt-2">Halo, ${escapeHtml(store.anak.nama)}! 👋</h1>
-                <p class="text-blue-100 text-sm mt-1">Latihan bertahap untuk membangun pemahaman konsep.</p>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="bg-white/10 backdrop-blur border border-white/20 px-4 py-3 rounded-2xl text-center">
-                  <div class="text-amber-300 font-extrabold text-lg flex items-center justify-center gap-1"><i data-lucide="check-circle" class="w-5 h-5"></i> ${riwayat.length}</div>
-                  <span class="text-[11px] text-blue-100">Sesi Selesai</span>
-                </div>
-                <div class="bg-white/10 backdrop-blur border border-white/20 px-4 py-3 rounded-2xl text-center">
-                  <div class="text-emerald-300 font-extrabold text-lg flex items-center justify-center gap-1"><i data-lucide="award" class="w-5 h-5"></i> ${benarTotal}</div>
-                  <span class="text-[11px] text-blue-100">Jawaban Tepat</span>
-                </div>
-              </div>
-            </div>
-            <div class="mt-6 bg-white/10 rounded-2xl p-4 border border-white/15">
-              <div class="flex justify-between text-xs mb-2 font-medium">
-                <span>Target Waktu: <strong>${menitTotal} dari ${targetMenit} Menit</strong></span>
-                <span>${persen}%</span>
-              </div>
-              <div class="w-full bg-black/20 rounded-full h-3 overflow-hidden">
-                <div class="bg-amber-400 h-3 rounded-full" style="width: ${persen}%"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="md:col-span-2 space-y-4">
-              <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
-                <div class="flex items-center justify-between">
-                  <h2 class="text-base font-bold text-slate-900">Mulai Latihan Hari Ini</h2>
-                  <button onclick="window.LMS.navigate('#/anak/rencana')" class="text-xs font-semibold text-blue-600 hover:underline">Rencana Lengkap</button>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div class="p-4 rounded-xl border border-blue-200 bg-blue-50/50 flex flex-col justify-between">
-                    <div>
-                      <span class="text-[10px] uppercase font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">Rekomendasi</span>
-                      <h3 class="font-bold text-sm text-slate-900 mt-2">Sesi Seimbang</h3>
-                      <p class="text-xs text-slate-500 mt-1">4 Soal • 2 Matematika & 2 B. Indonesia</p>
-                    </div>
-                    <button onclick="window.LMS.siapkanSesi('seimbang')" class="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm">Mulai Campuran</button>
-                  </div>
-                  <div class="p-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 flex flex-col justify-between">
-                    <div>
-                      <span class="text-[10px] uppercase font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">Fokus</span>
-                      <h3 class="font-bold text-sm text-slate-900 mt-2">Matematika</h3>
-                      <p class="text-xs text-slate-500 mt-1">4 Soal • Bilangan & Geometri</p>
-                    </div>
-                    <button onclick="window.LMS.siapkanSesi('matematika')" class="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl">Mulai Matematika</button>
-                  </div>
-                  <div class="p-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 flex flex-col justify-between">
-                    <div>
-                      <span class="text-[10px] uppercase font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">Fokus</span>
-                      <h3 class="font-bold text-sm text-slate-900 mt-2">B. Indonesia</h3>
-                      <p class="text-xs text-slate-500 mt-1">4 Soal • Teks Informasi & Sastra</p>
-                    </div>
-                    <button onclick="window.LMS.siapkanSesi('indonesia')" class="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl">Mulai B. Indonesia</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
-                <h2 class="text-base font-bold text-slate-900">Riwayat Latihan Terkini</h2>
-                ${riwayat.length === 0 ? `
-                  <div class="text-center py-6 border-2 border-dashed rounded-2xl text-xs text-slate-500">Belum ada sesi latihan yang diselesaikan. Pilih salah satu sesi di atas untuk mencoba.</div>
-                ` : `
-                  <div class="divide-y">
-                    ${riwayat.slice(-3).reverse().map((s, i) => `
-                      <div class="py-2.5 flex justify-between items-center text-xs">
-                        <div>
-                          <strong class="text-slate-800">Sesi #${riwayat.length - i} (${escapeHtml(s.mode)})</strong>
-                          <div class="text-slate-500">${s.tanggal} • ${s.jumlahBenar} dari ${s.totalSoal} Soal Benar</div>
-                        </div>
-                        <div class="text-right">
-                          <span class="text-base font-black text-blue-600 block">${s.skor}</span>
-                          <span class="text-[10px] text-slate-400">Skor</span>
-                        </div>
-                      </div>
-                    `).join('')}
-                  </div>
-                `}
-              </div>
-            </div>
-
-            <div class="space-y-4">
-              <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-2">
-                <h3 class="text-sm font-bold text-indigo-700 flex items-center gap-1.5"><i data-lucide="repeat" class="w-4 h-4"></i> Spaced Repetition</h3>
-                <p class="text-xs text-slate-600">Soal yang dijawab kurang tepat akan otomatis diprioritaskan untuk diulang pada sesi berikutnya.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function viewRencanaBelajar() {
-      return `
-        <div class="max-w-2xl mx-auto bg-white p-6 rounded-2xl border space-y-4">
-          <div class="flex items-center gap-2">
-            <button onclick="window.LMS.navigate('#/anak/dashboard')" class="p-1 rounded-lg hover:bg-slate-100"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-            <h1 class="text-lg font-bold">Rencana Pembelajaran Terarah</h1>
-          </div>
-          <p class="text-xs text-slate-600 leading-relaxed">Materi dirancang bertahap dari pemahaman konsep dasar menuju pemecahan masalah soal cerita.</p>
-          <div class="flex gap-2">
-            <button onclick="window.LMS.navigate('#/anak/materi')" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl">Buka Materi Konsep</button>
-            <button onclick="window.LMS.siapkanSesi('seimbang')" class="px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl">Latihan Campuran</button>
-          </div>
-        </div>
-      `;
-    }
-
-    function viewMateriPembelajaran() {
-      return `
-        <div class="max-w-2xl mx-auto bg-white p-6 rounded-3xl border space-y-4">
-          <button onclick="window.LMS.navigate('#/anak/dashboard')" class="text-xs font-bold text-slate-600">← Kembali</button>
-          <h1 class="text-xl font-extrabold">Operasi Hitung Campuran Bilangan Cacah</h1>
-          <p class="text-xs text-slate-600">Aturan prioritas: 1. Tanda Kurung ( ... ), 2. Kali/Bagi, 3. Tambah/Kurang.</p>
-          <div class="p-4 bg-slate-50 rounded-2xl border text-xs text-slate-800 space-y-1">
-            <strong>Contoh:</strong> 8 kotak @ 24 buku = 192 buku. Terjual 45 = 147 buku. Dibagikan merata ke 3 kelas = 49 buku per kelas.
-          </div>
-          <button onclick="window.LMS.siapkanSesi('seimbang')" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl">Uji Pemahaman</button>
-        </div>
-      `;
-    }
-
-    function viewHalamanLatihan(store) {
-      if (!store.sesiAktif?.soalList?.length) {
-        return `<div class="text-center py-12"><button onclick="window.LMS.navigate('#/anak/dashboard')" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold">Pilih Sesi di Dashboard</button></div>`;
-      }
-      const { soalList, indeksAktif } = store.sesiAktif;
-      const soal = soalList[indeksAktif];
-      const ans = store.jawabanSesiAktif[soal.id] || "";
-
-      return `
-        <div class="max-w-2xl mx-auto space-y-4">
-          <div class="bg-white p-4 rounded-2xl border flex justify-between items-center text-xs">
-            <span class="font-bold text-slate-700">Soal ${indeksAktif + 1} dari ${soalList.length}</span>
-            <span class="px-2 py-0.5 rounded-full font-bold ${soal.isSpacedRepetition ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}">
-              ${soal.isSpacedRepetition ? 'Pengulangan Terjadwal' : 'Soal Baru'}
-            </span>
-          </div>
-
-          <div class="bg-white rounded-3xl p-6 border space-y-4">
-            <span class="text-xs text-slate-500 font-semibold">${soal.mapel} • ${soal.kompetensi}</span>
-            ${soal.stimulus ? `<div class="p-3.5 bg-slate-50 rounded-xl text-xs text-slate-800 leading-relaxed">${soal.stimulus}</div>` : ""}
-            <p class="text-sm font-bold text-slate-900">${soal.tanya}</p>
-
-            <div class="space-y-2 pt-2">
-              ${soal.tipe === "PG" ? soal.opsi.map(opt => {
-                const kode = opt.trim().charAt(0);
-                const isSel = (ans === kode);
-                return `
-                  <label onclick="window.LMS.pilihJawaban('${soal.id}', '${kode}')" class="flex items-center gap-3 p-3 rounded-xl border-2 ${isSel ? 'border-blue-600 bg-blue-50/60 font-semibold' : 'border-slate-200'} cursor-pointer text-xs">
-                    <input type="radio" name="soal_rad" ${isSel ? 'checked' : ''}>
-                    <span>${escapeHtml(opt)}</span>
-                  </label>
-                `;
-              }).join('') : `
-                <input type="text" value="${escapeHtml(ans)}" oninput="window.LMS.simpanIsian('${soal.id}', this.value)" placeholder="Ketik jawaban Anda..." class="w-full px-3 py-2 border rounded-xl text-xs">
-              `}
-            </div>
-
-            <div class="flex justify-between pt-4 border-t">
-              <button onclick="window.LMS.pindahSoal(${indeksAktif - 1})" ${indeksAktif === 0 ? 'disabled class="opacity-40 text-xs font-bold"' : 'class="text-xs font-bold text-slate-700"'}>Sebelumnya</button>
-              ${indeksAktif < soalList.length - 1 ? `
-                <button onclick="window.LMS.pindahSoal(${indeksAktif + 1})" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold">Berikutnya</button>
-              ` : `
-                <button onclick="window.LMS.selesaikanSesi()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold">Kirim Jawaban</button>
-              `}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function viewHasilSesi(store) {
-      const latest = store.riwayatSesi[store.riwayatSesi.length - 1];
-      if (!latest) return `<div class="text-center py-12"><button onclick="window.LMS.navigate('#/anak/dashboard')">Kembali</button></div>`;
-
-      return `
-        <div class="max-w-md mx-auto bg-white p-8 rounded-3xl border text-center space-y-4">
-          <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full uppercase">Sesi Selesai</span>
-          <h1 class="text-5xl font-black text-blue-600">${latest.skor}</h1>
-          <p class="text-xs text-slate-500">${latest.jumlahBenar} dari ${latest.totalSoal} Soal Tepat</p>
-          <div class="grid grid-cols-2 gap-2 text-left text-xs pt-2">
-            <div class="p-3 bg-blue-50 border rounded-xl"><strong>Soal Baru</strong>: ${latest.baruBenar}/${latest.baruTotal} Benar</div>
-            <div class="p-3 bg-amber-50 border rounded-xl"><strong>Pengulangan</strong>: ${latest.ulangBenar}/${latest.ulangTotal} Benar</div>
-          </div>
-          <div class="flex gap-2 pt-2">
-            <button onclick="window.LMS.navigate('#/anak/pembahasan')" class="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold">Pembahasan</button>
-            <button onclick="window.LMS.navigate('#/anak/dashboard')" class="flex-1 py-2.5 bg-slate-100 rounded-xl text-xs font-bold">Dashboard</button>
-          </div>
-        </div>
-      `;
-    }
-
-    function viewHalamanPembahasan(store) {
-      const soalList = store.sesiAktif?.soalList || store.bankSoal.slice(0, 4);
-      return `
-        <div class="max-w-2xl mx-auto space-y-4">
-          <div class="flex justify-between items-center">
-            <h1 class="text-lg font-bold">Pembahasan Jawaban</h1>
-            <button onclick="window.LMS.navigate('#/anak/dashboard')" class="text-xs font-bold text-blue-600">Selesai</button>
-          </div>
-          ${soalList.map((s, idx) => {
-            const userAns = store.jawabanSesiAktif[s.id];
-            const res = periksaJawaban(s, userAns);
-            return `
-              <div class="bg-white p-5 rounded-2xl border space-y-2 text-xs">
-                <div class="flex justify-between font-bold">
-                  <span>#${idx + 1} • ${s.mapel}</span>
-                  <span class="${res.status === 'BENAR' ? 'text-emerald-600' : (res.status === 'KOSONG' ? 'text-slate-500' : 'text-rose-600')}">${res.status}</span>
-                </div>
-                <p class="text-slate-800">${s.tanya}</p>
-                <div class="p-3 bg-slate-50 rounded-xl text-slate-700 space-y-1">
-                  <div>Jawaban Kamu: <strong>${escapeHtml(userAns || 'Tidak diisi')}</strong> | Kunci: <strong class="text-emerald-700">${s.kunci}</strong></div>
-                  <p class="text-slate-600 pt-1"><strong>Langkah Solusi:</strong> ${s.pembahasan}</p>
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-    }
-
-    function viewDashboardOrtu(store) {
-      return `
-        <div class="max-w-2xl mx-auto bg-white p-6 rounded-2xl border space-y-3">
-          <h1 class="text-lg font-bold text-purple-900">Pantauan Orang Tua: ${escapeHtml(store.anak.nama)}</h1>
-          <p class="text-xs text-slate-600">Total sesi yang diselesaikan anak: <strong>${store.riwayatSesi.length} Sesi</strong></p>
-          <div class="p-3.5 bg-purple-50 rounded-xl text-xs text-purple-900">
-            <strong>Rekomendasi:</strong> ${escapeHtml(store.ortu.catatanRekomendasi)}
-          </div>
-        </div>
-      `;
-    }
-
-    function viewEvaluasiSimulasi() {
-      return `
-        <div class="max-w-2xl mx-auto bg-white p-6 rounded-2xl border space-y-2 text-xs">
-          <h1 class="text-base font-bold text-slate-900">Kalender Asesmen Resmi 2027</h1>
-          <p class="text-slate-600">• Asesmen Akhir Jenjang SD (ASAJ): <strong>11 – 22 Mei 2027</strong></p>
-          <p class="text-slate-600">• TKA Pusat 2027: Menunggu rilis jadwal resmi pemerintah.</p>
-        </div>
-      `;
-    }
-
-    function viewAdminKonten(store) {
-      return `
-        <div class="max-w-4xl mx-auto space-y-4">
-          <div class="flex justify-between items-center">
-            <h1 class="text-lg font-bold">Bank Soal Draf (${store.bankSoal.length} Butir)</h1>
-            <button onclick="window.LMS.openAdminModal()" class="px-3 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-bold">+ Tambah Soal</button>
-          </div>
-          <div class="bg-white rounded-2xl border overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-slate-50 border-b">
-                <tr><th class="p-3">ID</th><th class="p-3">Mapel</th><th class="p-3">Kompetensi</th><th class="p-3">Kunci</th><th class="p-3 text-center">Aksi</th></tr>
-              </thead>
-              <tbody class="divide-y">
-                ${store.bankSoal.map(b => `
-                  <tr>
-                    <td class="p-3 font-mono font-bold">${b.id}</td>
-                    <td class="p-3">${b.mapel}</td>
-                    <td class="p-3">${b.kompetensi}</td>
-                    <td class="p-3 font-bold text-blue-600">${b.kunci}</td>
-                    <td class="p-3 text-center">
-                      <button onclick="window.LMS.editSoal('${b.id}')" class="text-blue-600 font-bold mr-2">Edit</button>
-                      <button onclick="window.LMS.hapusSoal('${b.id}')" class="text-rose-600 font-bold">Hapus</button>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
-    }
-
-    window.LMS = {
-      navigate,
-      pilihRole(role) {
-        const s = getStore();
-        s.role = role;
-        saveStore(s);
-        if (role === "anak") navigate("#/anak/dashboard");
-        else if (role === "ortu") navigate("#/ortu/dashboard");
-        else navigate("#/admin");
-      },
-      siapkanSesi(mode) {
-        const s = getStore();
-        const bank = s.bankSoal;
-        const mat = bank.filter(x => x.mapel === "Matematika");
-        const ind = bank.filter(x => x.mapel === "Bahasa Indonesia");
-
-        let terpilih = [];
-        if (mode === "matematika") terpilih = mat.slice(0, 4);
-        else if (mode === "indonesia") terpilih = ind.slice(0, 4);
-        else terpilih = [...mat.slice(0, 2), ...ind.slice(0, 2)];
-
-        s.sesiAktif = {
-          mode,
-          indeksAktif: 0,
-          soalList: terpilih.map(q => ({
-            ...q,
-            isSpacedRepetition: Boolean(s.riwayatSoal[q.id]?.isScheduledSpaced)
-          }))
-        };
-        s.jawabanSesiAktif = {};
-        s.sesiSudahDisimpan = false;
-        saveStore(s);
-        navigate("#/anak/latihan");
-      },
-      pilihJawaban(id, kode) {
-        const s = getStore();
-        s.jawabanSesiAktif[id] = kode;
-        saveStore(s);
-        renderApp();
-      },
-      simpanIsian(id, val) {
-        const s = getStore();
-        s.jawabanSesiAktif[id] = val.trim();
-        saveStore(s);
-      },
-      pindahSoal(idx) {
-        const s = getStore();
-        if (s.sesiAktif && idx >= 0 && idx < s.sesiAktif.soalList.length) {
-          s.sesiAktif.indeksAktif = idx;
-          saveStore(s);
-          renderApp();
-        }
-      },
-      selesaikanSesi() {
-        const s = getStore();
-        if (!s.sesiAktif || s.sesiSudahDisimpan) return navigate("#/anak/hasil");
-
-        let benar = 0, bTot = 0, bBen = 0, uTot = 0, uBen = 0;
-        s.sesiAktif.soalList.forEach(q => {
-          const res = periksaJawaban(q, s.jawabanSesiAktif[q.id]);
-          if (res.isBenar) benar++;
-          if (q.isSpacedRepetition) {
-            uTot++;
-            if (res.isBenar) uBen++;
-          } else {
-            bTot++;
-            if (res.isBenar) bBen++;
-          }
-
-          if (!s.riwayatSoal[q.id]) s.riwayatSoal[q.id] = { totalAttempt: 0, totalCorrect: 0, isScheduledSpaced: false };
-          s.riwayatSoal[q.id].totalAttempt++;
-          if (res.isBenar) {
-            s.riwayatSoal[q.id].totalCorrect++;
-            s.riwayatSoal[q.id].isScheduledSpaced = false;
-          } else {
-            s.riwayatSoal[q.id].isScheduledSpaced = true;
-          }
-        });
-
-        s.riwayatSesi.push({
-          id: "SESI-" + Date.now(),
-          tanggal: new Date().toLocaleDateString("id-ID"),
-          mode: s.sesiAktif.mode,
-          totalSoal: s.sesiAktif.soalList.length,
-          jumlahBenar: benar,
-          skor: Math.round((benar / s.sesiAktif.soalList.length) * 100),
-          estimasiMenit: 15,
-          baruTotal: bTot, baruBenar: bBen, ulangTotal: uTot, ulangBenar: uBen
-        });
-        s.sesiSudahDisimpan = true;
-        saveStore(s);
-        navigate("#/anak/hasil");
-      },
-      resetData() {
-        if (confirm("Reset data demo ke awal?")) {
-          localStorage.removeItem(STORE_KEY);
-          location.reload();
-        }
-      },
-      openAdminModal(soal = null) {
-        const modal = document.getElementById("admin-modal");
-        document.getElementById("modal-error").classList.add("hidden");
-        if (soal) {
-          document.getElementById("modal-title").textContent = "Edit Soal (" + soal.id + ")";
-          document.getElementById("edit-original-id").value = soal.id;
-          document.getElementById("soal-id").value = soal.id;
-          document.getElementById("soal-id").disabled = true;
-          document.getElementById("soal-mapel").value = soal.mapel;
-          document.getElementById("soal-kompetensi").value = soal.kompetensi;
-          document.getElementById("soal-kesulitan").value = soal.kesulitan;
-          document.getElementById("soal-tipe").value = soal.tipe;
-          document.getElementById("soal-stimulus").value = soal.stimulus || "";
-          document.getElementById("soal-tanya").value = soal.tanya;
-          document.getElementById("soal-pembahasan").value = soal.pembahasan;
-          window.LMS.toggleFormTipe(soal.tipe);
-          if (soal.tipe === "PG") {
-            document.getElementById("soal-opsi-a").value = soal.opsi[0] || "";
-            document.getElementById("soal-opsi-b").value = soal.opsi[1] || "";
-            document.getElementById("soal-opsi-c").value = soal.opsi[2] || "";
-            document.getElementById("soal-opsi-d").value = soal.opsi[3] || "";
-            document.getElementById("soal-kunci-pg").value = soal.kunci;
-          } else {
-            document.getElementById("soal-kunci-isian").value = soal.kunci;
-            document.getElementById("soal-alt-isian").value = (soal.alternatifKunci || []).join(", ");
-          }
-        } else {
-          document.getElementById("modal-title").textContent = "Tambah Soal Draf";
-          document.getElementById("edit-original-id").value = "";
-          document.getElementById("soal-id").value = "";
-          document.getElementById("soal-id").disabled = false;
-          document.getElementById("form-soal").reset();
-          window.LMS.toggleFormTipe("PG");
-        }
-        modal.classList.remove("hidden");
-        if (window.lucide) lucide.createIcons();
-      },
-      closeAdminModal() {
-        document.getElementById("admin-modal").classList.add("hidden");
-      },
-      toggleFormTipe(t) {
-        if (t === "PG") {
-          document.getElementById("pg-fields").classList.remove("hidden");
-          document.getElementById("isian-fields").classList.add("hidden");
-        } else {
-          document.getElementById("pg-fields").classList.add("hidden");
-          document.getElementById("isian-fields").classList.remove("hidden");
-        }
-      },
-      handleSaveSoal(e) {
-        e.preventDefault();
-        const s = getStore();
-        const origId = document.getElementById("edit-original-id").value;
-        const id = document.getElementById("soal-id").value.trim().toUpperCase();
-        const tipe = document.getElementById("soal-tipe").value;
-
-        if (!origId && s.bankSoal.some(x => x.id === id)) {
-          alert("ID sudah digunakan!");
-          return;
-        }
-
-        let opsi = [], kunci = "", alt = [];
-        if (tipe === "PG") {
-          opsi = [
-            document.getElementById("soal-opsi-a").value.trim(),
-            document.getElementById("soal-opsi-b").value.trim(),
-            document.getElementById("soal-opsi-c").value.trim(),
-            document.getElementById("soal-opsi-d").value.trim()
-          ];
-          kunci = document.getElementById("soal-kunci-pg").value;
-        } else {
-          kunci = document.getElementById("soal-kunci-isian").value.trim();
-          alt = document.getElementById("soal-alt-isian").value.split(",").map(x => x.trim()).filter(Boolean);
-        }
-
-        const item = {
-          id,
-          mapel: document.getElementById("soal-mapel").value,
-          kompetensi: document.getElementById("soal-kompetensi").value.trim(),
-          kesulitan: document.getElementById("soal-kesulitan").value,
-          tipe,
-          stimulus: document.getElementById("soal-stimulus").value.trim(),
-          tanya: document.getElementById("soal-tanya").value.trim(),
-          opsi, kunci, alternatifKunci: alt,
-          pembahasan: document.getElementById("soal-pembahasan").value.trim(),
-          statusVerifikasi: "Draf AI — Perlu Verifikasi Manusia"
-        };
-
-        if (origId) {
-          const idx = s.bankSoal.findIndex(x => x.id === origId);
-          if (idx !== -1) s.bankSoal[idx] = item;
-        } else {
-          s.bankSoal.push(item);
-        }
-
-        saveStore(s);
-        window.LMS.closeAdminModal();
-        renderApp();
-      },
-      editSoal(id) {
-        const s = getStore();
-        const item = s.bankSoal.find(x => x.id === id);
-        if (item) window.LMS.openAdminModal(item);
-      },
-      hapusSoal(id) {
-        if (confirm("Hapus soal ini?")) {
-          const s = getStore();
-          s.bankSoal = s.bankSoal.filter(x => x.id !== id);
-          saveStore(s);
-          renderApp();
-        }
-      }
-    };
-
-    window.addEventListener("hashchange", renderApp);
-    window.addEventListener("DOMContentLoaded", () => {
-      if (!window.location.hash) window.location.hash = "#/anak/dashboard";
-      renderApp();
-    });
-  </script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
