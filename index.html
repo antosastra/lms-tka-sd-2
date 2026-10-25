@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="./css/styles.css">
   <script>
     tailwind.config = {
       theme: {
@@ -25,7 +25,7 @@
 
   <aside class="bg-amber-100 border-b border-amber-300 text-amber-900 px-4 py-2 text-xs font-medium text-center flex items-center justify-center gap-2">
     <i data-lucide="info" class="w-4 h-4 text-amber-700 flex-shrink-0"></i>
-    <span><strong>FASE 1.1:</strong> Multi-Subject Foundation & Bank Soal Terverifikasi. Hanya soal terverifikasi yang muncul di latihan siswa.</span>
+    <span><strong>FASE 1.1:</strong> Multi-Subject Foundation & Bank Soal. Hanya butir soal berstatus <strong>Verified</strong> yang dapat dikerjakan siswa.</span>
   </aside>
 
   <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
@@ -72,7 +72,7 @@
           <div>
             <label class="block font-bold text-slate-700 mb-1">Status Verifikasi *</label>
             <select id="soal-status" class="w-full px-3 py-2 border rounded-xl">
-              <option value="draft">Draf (Baru dibuat)</option>
+              <option value="draft">Draf (Draft)</option>
               <option value="needs_review">Perlu Ditinjau (Needs Review)</option>
               <option value="verified">Terverifikasi (Verified)</option>
               <option value="archived">Diarsipkan (Archived)</option>
@@ -99,13 +99,13 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Kompetensi / Kemampuan Diukur *</label>
+          <label class="block font-bold text-slate-700 mb-1">Kompetensi Diukur *</label>
           <input type="text" id="soal-kompetensi" placeholder="Operasi Hitung Campuran" class="w-full px-3 py-2 border rounded-xl" required>
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">Stimulus / Wacana (Opsional)</label>
-          <textarea id="soal-stimulus" rows="3" class="w-full px-3 py-2 border rounded-xl" placeholder="Teks bacaan atau cerita pengantar..."></textarea>
+          <textarea id="soal-stimulus" rows="3" class="w-full px-3 py-2 border rounded-xl" placeholder="Teks wacana..."></textarea>
         </div>
 
         <div>
@@ -133,8 +133,8 @@
             <input type="text" id="soal-kunci-isian" placeholder="Contoh: 1.5 atau waspada" class="w-full px-3 py-2 border rounded-xl bg-white">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Alternatif Kunci Disetujui (Pisahkan dengan tanda koma)</label>
-            <input type="text" id="soal-alt-isian" placeholder="1,5, waspada, berhati-hati" class="w-full px-3 py-2 border rounded-xl bg-white">
+            <label class="block font-bold text-slate-700 mb-1">Alternatif Kunci (Pisahkan tanda koma)</label>
+            <input type="text" id="soal-alt-isian" placeholder="1,5, waspada, hati-hati" class="w-full px-3 py-2 border rounded-xl bg-white">
           </div>
         </div>
 
@@ -155,18 +155,15 @@
   <div id="import-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-xs">
       <div class="flex items-center justify-between border-b pb-3">
-        <h3 class="text-base font-bold text-slate-900">Impor Bank Soal (Format JSON)</h3>
+        <h3 class="text-base font-bold text-slate-900">Impor Bank Soal (JSON)</h3>
         <button onclick="window.LMS.closeImportModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <p class="text-slate-600">Pilih berkas <code>.json</code> yang berisi array soal. Struktur dan ID akan divalidasi sebelum disimpan.</p>
-      
+      <p class="text-slate-600">Pilih berkas JSON daftar butir soal. Format skema dan ID divalidasi sebelum disimpan.</p>
       <input type="file" id="json-file-input" accept=".json" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-      
       <div id="import-report" class="hidden p-3 rounded-xl border max-h-48 overflow-y-auto"></div>
-
       <div class="pt-2 border-t flex justify-end gap-2">
         <button type="button" onclick="window.LMS.closeImportModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-bold">Tutup</button>
-        <button type="button" onclick="window.LMS.prosesImporJSON()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md">Validasi & Terapkan</button>
+        <button type="button" onclick="window.LMS.prosesImporJSON()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md">Terapkan Impor</button>
       </div>
     </div>
   </div>
@@ -181,6 +178,7 @@
     </div>
   </footer>
 
-  <script type="module" src="js/app.js"></script>
+  <!-- Pemanggilan Modul Utama dengan Jalur Relatif Aman -->
+  <script type="module" src="./js/app.js"></script>
 </body>
 </html>
