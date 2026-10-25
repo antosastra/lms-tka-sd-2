@@ -25,9 +25,6 @@ export function getDefaultState() {
   };
 }
 
-/**
- * Migrasi data lama dari skema Fase 1 ke skema multi-mapel Fase 1.1
- */
 function migrasiDataLama(parsed) {
   let migrated = false;
 
@@ -38,7 +35,6 @@ function migrasiDataLama(parsed) {
 
   if (Array.isArray(parsed.bankSoal)) {
     parsed.bankSoal = parsed.bankSoal.map(item => {
-      // Normalisasi field lama
       const subjectId = item.subjectId || (item.mapel === "Matematika" ? "matematika" : "bahasa-indonesia");
       const questionType = item.questionType || item.tipe || "PG";
       const question = item.question || item.tanya || "";
@@ -48,7 +44,6 @@ function migrasiDataLama(parsed) {
       const competencyId = item.competencyId || item.kompetensi || "Umum";
       const topicId = item.topicId || (subjectId === "matematika" ? "mat-bilangan" : "ind-informasi");
       
-      // Pertahankan status verifikasi yang aman
       let verificationStatus = item.verificationStatus;
       if (!verificationStatus || verificationStatus.includes("Draf AI")) {
         verificationStatus = "needs_review";
@@ -99,7 +94,7 @@ export function getStore() {
     }
     return data;
   } catch (e) {
-    console.warn("Peringatan: Gagal membaca data LocalStorage. Mengembalikan state default yang bersih.", e);
+    console.warn("Gagal membaca LocalStorage. Menggunakan state default.", e);
     const fallback = getDefaultState();
     saveStore(fallback);
     return fallback;
